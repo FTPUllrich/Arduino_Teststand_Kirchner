@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMG ReqIF Grafischer Web-Viewer & Editor</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="bg-[#0b1120] text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- ======================================================================= -->
+  <!-- HEADER -->
+  <!-- ======================================================================= -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white leading-none">OMG ReqIF Grafischer Viewer</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">ReqIF 1.0 / Eclipse Capella Hub</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Visueller Requirements-Reader & Baumstruktur für Capella, DOORS & Polarion</p>
+        </div>
+      </div>
+
+      <!-- Datei-Upload & Ansichts-Umschalter -->
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+          <span>Eigene .reqif laden</span>
+          <input type="file" id="fileInput" accept=".reqif,.xml" class="hidden" onchange="handleFileSelect(event)">
+        </label>
+        <button onclick="downloadCurrentReqIF()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          ReqIF exportieren
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- HAUPT-LAYOUT (2 SPALTEN) -->
+  <!-- ======================================================================= -->
+  <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LINKE SPALTE (4 Cols): Dokumenten-Baum & Metadaten -->
+    <div class="lg:col-span-4 flex flex-col gap-5">
+      
+      <!-- ReqIF Datei-Metadaten -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Dokument-Header</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400" id="headerVersion">ReqIF 1.0</span>
+        </div>
+        <div class="mt-3.5 space-y-2 text-xs">
+          <div>
+            <span class="text-slate-400 block text-[11px]">Titel:</span>
+            <span class="font-bold text-white" id="headerTitle">Mikrocontroller-Teststand Lastenheft</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Generator / Tool-ID:</span>
+            <span class="font-mono text-slate-300" id="headerTool">Eclipse Capella ReqIF Engine</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Erstellungszeit:</span>
+            <span class="font-mono text-slate-300" id="headerTime">2026-09-01</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dokument-Strukturbaum (Hierarchie) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Spezifikations-Baum</span>
+          <span class="text-[11px] text-cyan-400 font-mono" id="treeCountBadge">15 Objekte</span>
+        </div>
+        <div class="overflow-y-auto custom-scrollbar flex-1 max-h-[500px] space-y-1" id="treeContainer">
+          <!-- Dynamischer Baum -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RECHTE SPALTE (8 Cols): Grafische Anforderungs-Karten / Detailansicht -->
+    <div class="lg:col-span-8 flex flex-col gap-5">
+      
+      <!-- Such- & Filterleiste -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div class="relative w-full sm:w-72">
+          <svg class="w-4 h-4 absolute left-3.5 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="filterInput" oninput="renderRequirements()" placeholder="ReqIF durchsuchen..." 
+                 class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button onclick="setViewMode('cards')" id="btnViewCards" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-slate-950 shadow">Kartenansicht</button>
+          <button onclick="setViewMode('xml')" id="btnViewXml" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">XML-Quellcode</button>
+        </div>
+      </div>
+
+      <!-- Container für Karten-Ansicht -->
+      <div id="cardsView" class="space-y-4">
+        <!-- Dynamische Anforderungskarten -->
+      </div>
+
+      <!-- Container für XML-Ansicht -->
+      <div id="xmlView" class="hidden bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <pre class="text-xs font-mono text-emerald-400 overflow-x-auto custom-scrollbar max-h-[650px]" id="rawXmlContent"></pre>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT REQIF PARSER & RENDERER -->
+  <script>
+    // Standard-ReqIF XML Daten unseres Teststands
+    let reqifXmlText = `<?xml version="1.0" encoding="UTF-8"?>
+<REQ-IF xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd" xml:lang="de">
+  <THE-HEADER>
+    <REQ-IF-HEADER IDENTIFIER="header-arduino-teststand-001">
+      <COMMENT>System-Anforderungsspezifikation (VDI 2206 / VDI 2221) fuer Eclipse Capella MBSE</COMMENT>
+      <CREATION-TIME>2026-09-01T09:03:00Z</CREATION-TIME>
+      <REQ-IF-TOOL-ID>Eclipse Capella ReqIF Generator</REQ-IF-TOOL-ID>
+      <REQ-IF-VERSION>1.0</REQ-IF-VERSION>
+      <SOURCE-TOOL-ID>Antigravity Systems Engineering Engine</SOURCE-TOOL-ID>
+      <TITLE>Mikrocontroller-Teststand Lastenheft</TITLE>
+    </REQ-IF-HEADER>
+  </THE-HEADER>
+  <CORE-CONTENT>
+    <REQ-IF-CONTENT>
+      <SPEC-OBJECTS>
+        <SPEC-OBJECT IDENTIFIER="so_A01" LONG-NAME="A-01">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-01"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sensorik &amp; Erfassung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Analoge Eingangserfassung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Erfassung eines kontinuierlichen Analogsignals ueber 10-Bit-ADC (0..1023 Digits = 0..5V) an Analogeingang A0."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Linearitaetsfehler &lt;= +-2 LSB"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kalibrierte DC-Spannungsquelle &amp; Digitalmultimeter (DMM)"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A02" LONG-NAME="A-02">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-02"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Signalverarbeitung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Rauschunterdrueckung &amp; Glaettung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Berechnung des gleitenden arithmetischen Mittelwerts ueber exakt N=10 aufeinanderfolgende Samples."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Abtastintervall dt=50ms +- 2ms (20 Hz Abtastrate)"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Signalvergleich Roh- vs. Filterwert im Serial Plotter"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A03" LONG-NAME="A-03">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-03"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemskalierung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Erweiterbarkeit der Eingangskanaele"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Hard- und Softwarearchitektur ausgelegt fuer modulare Erweiterung auf bis zu 6 Analogkanaele (A0-A5)."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Architektur unterstuetzt A0..A5"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Funktionstest mit bis zu 6 analogen Signalgebern"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A04" LONG-NAME="A-04">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-04"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kommunikation"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zyklische Bus-Datenuebertragung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zyklische Uebertragung des gemittelten Werts via UART-Bus (Serial1) mit Framing &lt;VAL:xxxx;RAW:xxxx&gt;."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Uebertragungsrate f_bus &gt;= 10 Hz (Intervall &lt;= 100ms), 9600 Baud 8N1"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logikanalysator / Serial-Monitor-Trace mit Zeitstempeln"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A05" LONG-NAME="A-05">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-05"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemrobustheit"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Bus-Timeout &amp; Verbindungsueberwachung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Automatische Erkennung eines Signal- oder Telegrammausfalls mit LCD-Warnmeldung und Auto-Recovery."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Fehlermeldung auf LCD bei Telegrammausfall &gt; 2.0 s"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Unterbrechung der RX/TX-Signalleitung im laufenden Betrieb"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A06" LONG-NAME="A-06">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-06"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Display"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="LC-Display Ansteuerung via I2C"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Anbindung eines HD44780-kompatiblen LC-Displays (20 Zeichen x 4 Zeilen) ueber I2C-Backpack (PCF8574)."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="I2C-Busfrequenz 100 kHz, Adresse 0x27 / 0x3F"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="I2C-Bus-Scan / Hardwaretest mit Oszilloskop"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A07" LONG-NAME="A-07">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-07"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Format"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Binaere Messwertdarstellung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Formatierte 10-Bit-Binaerausgabe mit fuehrenden Nullen und 4-Bit-Nibble-Strukturierung (BIN: bb bbbb bbbb)."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Formatierung BIN: bb bbbb bbbb auf Zeile 1"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sichtpruefung der LCD-Anzeige ueber gesamten Stellbereich (0..1023)"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A08" LONG-NAME="A-08">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-08"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Bedienung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Messwert-Aktualisierung (Hold-Trigger)"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Aktualisierung des Anzeigewerts ausschliesslich bei Betaetigung des Tasters (Hold-Funktion)."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Software-Entprellzeit t_deb &gt;= 50 ms"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Prellpruefung / Funktionstest mit Oszilloskop am Tastereingang"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A09" LONG-NAME="A-09">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-09"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemdynamik"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Reaktionszeit HMI-Aktualisierung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Latenzzeit zwischen Tasterbetaetigung (fallende Flanke) und vollstaendiger LCD-Aktualisierung."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Latenz t_lat &lt;= 100 ms"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="2-Kanal-Oszilloskop (Trigger Flanke Taster -&gt; I2C Paket)"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A10" LONG-NAME="A-10">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-10"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemstart"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Definiertes Initialisierungsverhalten"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Nach Kaltstart (Power-On): Boot-Screen (2s), Ringpuffer-Vorbefuellung, definierter Wartezustand."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Boot-Screen 2s, MOD: WAIT TASTE"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Einschaltpruefung / Kaltstart-Zyklus mit Netztrennung"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A11" LONG-NAME="A-11">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-11"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logik &amp; Alarm"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Plausibilitaets- &amp; Grenzwertueberwachung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Optischer Alarm auf dem LCD bei relativem Sprung &gt;= 70% mit Nullpunktsschutz (|Delta| &gt;= 50 Digits)."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm bei |Wert_k - Wert_k-1| &gt;= 0.70 * Wert_k-1"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sprungantwort-Test mit Signalgenerator / Poti-Sprung"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A12" LONG-NAME="A-12">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-12"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logik &amp; Alarm"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm-Ruecksetzung / Quittierung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Der optische Alarmzustand bleibt aktiv, bis ein neuer Messwert innerhalb der Toleranz uebernommen wird."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm-Ruecksetzung bei gueltigem neuem Tastendruck"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Stufentest mit Rueckkehr in den Nennbereich"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A13" LONG-NAME="A-13">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-13"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Datenspeicher"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Direkter Datenzugriff im Speicher"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Strukturierte Vorhaltung von aktuellem Messwert, Vorgaengerwert, Puffer und Flags im SRAM."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Vorhaltung im fluechtigen SRAM"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Code-Review &amp; RAM-Belegungsanalyse via Compiler"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A14" LONG-NAME="A-14">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-14"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Elektrik &amp; Schutz"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsspannung &amp; Schutzbeschaltung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Versorgungsspannung +5.0V DC +- 5%, zwingendes gemeinsames Bezugspotenzial (GND) und Pull-Ups."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="+5.0V DC +- 5%, GND-Kopplung zwingend"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="DMM-Spannungsmessung &amp; Verifikationspruefung"/>
+          </VALUES>
+        </SPEC-OBJECT>
+        <SPEC-OBJECT IDENTIFIER="so_A15" LONG-NAME="A-15">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-15"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Umgebungsbed."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsumgebung &amp; Laborbetrieb"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsbereich: +10 C bis +40 C, relative Luftfeuchtigkeit 20%..80% (nicht kondensierend), IP20."/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Laborbetriebsbereich 10..40 C, IP20"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sicht- und Funktionspruefung unter Laborbedingungen"/>
+          </VALUES>
+        </SPEC-OBJECT>
+      </SPEC-OBJECTS>
+    </REQ-IF-CONTENT>
+  </CORE-CONTENT>
+</REQ-IF>`;
+
+    let parsedData = [];
+
+    function parseReqIF(xmlString) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+
+      // Header parsen
+      const titleNode = xmlDoc.querySelector("THE-HEADER TITLE");
+      const toolNode = xmlDoc.querySelector("THE-HEADER REQ-IF-TOOL-ID");
+      const timeNode = xmlDoc.querySelector("THE-HEADER CREATION-TIME");
+      
+      if (titleNode) document.getElementById('headerTitle').innerText = titleNode.textContent;
+      if (toolNode) document.getElementById('headerTool').innerText = toolNode.textContent;
+      if (timeNode) document.getElementById('headerTime').innerText = timeNode.textContent;
+
+      document.getElementById('rawXmlContent').innerText = xmlString;
+
+      // Spec-Objects parsen
+      parsedData = [];
+      const specObjects = xmlDoc.querySelectorAll("SPEC-OBJECT");
+
+      specObjects.forEach(obj => {
+        const id = obj.getAttribute("LONG-NAME") || obj.getAttribute("IDENTIFIER");
+        const stringValues = obj.querySelectorAll("ATTRIBUTE-VALUE-STRING");
+        
+        let cat = "Allgemein";
+        let title = id;
+        let desc = "";
+        let target = "";
+        let verif = "";
+
+        if (stringValues.length >= 6) {
+          cat = stringValues[1].getAttribute("THE-VALUE") || stringValues[1].textContent;
+          title = stringValues[2].getAttribute("THE-VALUE") || stringValues[2].textContent;
+          desc = stringValues[3].getAttribute("THE-VALUE") || stringValues[3].textContent;
+          target = stringValues[4].getAttribute("THE-VALUE") || stringValues[4].textContent;
+          verif = stringValues[5].getAttribute("THE-VALUE") || stringValues[5].textContent;
+        } else if (stringValues.length >= 2) {
+          title = stringValues[0].getAttribute("THE-VALUE") || stringValues[0].textContent;
+          desc = stringValues[1].getAttribute("THE-VALUE") || stringValues[1].textContent;
+        }
+
+        parsedData.push({ id, cat, title, desc, target, verif });
+      });
+
+      renderTree();
+      renderRequirements();
+    }
+
+    function renderTree() {
+      const tree = document.getElementById('treeContainer');
+      tree.innerHTML = '';
+      document.getElementById('treeCountBadge').innerText = `${parsedData.length} Objekte`;
+
+      parsedData.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-2 rounded-lg hover:bg-slate-800 text-xs flex items-center justify-between transition-colors group';
+        btn.onclick = () => scrollToCard(item.id);
+        btn.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="text-emerald-400 font-mono font-bold">${item.id}</span>
+            <span class="text-slate-300 truncate group-hover:text-white">${item.title}</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono">▸</span>
+        `;
+        tree.appendChild(btn);
+      });
+    }
+
+    function renderRequirements() {
+      const filter = document.getElementById('filterInput').value.toLowerCase();
+      const container = document.getElementById('cardsView');
+      container.innerHTML = '';
+
+      const filtered = parsedData.filter(d => 
+        d.id.toLowerCase().includes(filter) || 
+        d.title.toLowerCase().includes(filter) || 
+        d.desc.toLowerCase().includes(filter) ||
+        d.cat.toLowerCase().includes(filter)
+      );
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.id = `card_${item.id}`;
+        card.className = 'bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 rounded-2xl p-5 shadow-xl transition-all';
+        card.innerHTML = `
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs">${item.id}</span>
+              <span class="text-xs text-slate-400 font-medium">${item.cat}</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">OMG SPEC-OBJECT</span>
+          </div>
+
+          <h3 class="text-base font-bold text-white mb-2">${item.title}</h3>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">${item.desc}</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-800/80 text-xs font-mono">
+            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase text-slate-400 block mb-1">Zielwert / Akzeptanzkriterium:</span>
+              <span class="text-emerald-300 font-semibold">${item.target || 'Kein fester Zielwert'}</span>
+            </div>
+            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] uppercase text-slate-400 block mb-1">Verifikationsmethode:</span>
+              <span class="text-cyan-300 font-semibold">${item.verif || 'Sicht- / Funktionstest'}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function scrollToCard(id) {
+      const el = document.getElementById(`card_${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-emerald-400');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-400'), 1800);
+      }
+    }
+
+    function setViewMode(mode) {
+      if (mode === 'cards') {
+        document.getElementById('cardsView').classList.remove('hidden');
+        document.getElementById('xmlView').classList.add('hidden');
+        document.getElementById('btnViewCards').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-slate-950 shadow';
+        document.getElementById('btnViewXml').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+      } else {
+        document.getElementById('cardsView').classList.add('hidden');
+        document.getElementById('xmlView').classList.remove('hidden');
+        document.getElementById('btnViewXml').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-slate-950 shadow';
+        document.getElementById('btnViewCards').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+      }
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        reqifXmlText = e.target.result;
+        parseReqIF(reqifXmlText);
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadCurrentReqIF() {
+      const blob = new Blob([reqifXmlText], { type: 'application/xml;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Anforderungen_Arduino_Teststand.reqif";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    window.onload = () => parseReqIF(reqifXmlText);
+  </script>
+</body>
+</html>

@@ -72,6 +72,7 @@ Projekt_Kirchner_Unterricht/
 ├── Anforderungsspezifikation_Arduino_Teststand.md  # Normgerechtes Lastenheft (VDI 2206 / VDI 2221)
 ├── Deterministischer_Automat_Dokumentation.md      # Formale DFA/FSM-Spezifikation (Zustandsautomat & Tabellen)
 ├── Requirements_Management_Portal.html             # Interaktives Web-Portal zur Verwaltung & Live-Export der Anforderungen
+├── ReqIF_Grafischer_Viewer.html                    # Grafischer OMG ReqIF 1.0 Web-Viewer & Strukturbaum für den Browser
 ├── Aufbauanleitung_und_Schaltplan.md               # Pin-to-Pin Verdrahtungsplan & Laboranleitung
 ├── Capella_Import_Anleitung.md                     # Import- & Modellierungsanleitung für Eclipse Capella
 ├── Anforderungen_Arduino_Teststand.reqif           # OMG ReqIF 1.0 Modelldatei für Eclipse Capella & DOORS
