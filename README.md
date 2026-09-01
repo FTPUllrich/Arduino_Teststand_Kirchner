@@ -69,6 +69,7 @@
 Projekt_Kirchner_Unterricht/
 ├── README.md                                       # Projektübersicht, Key Features & Status
 ├── .gitignore                                      # Ausschluss von Build-Artefakten
+├── Anforderungs_Audit_und_Konsequenzen.md          # Detaillierte Prüfung & Konsequenzen aus der Schulcheckliste (11 Kriterien)
 ├── Anforderungsspezifikation_Arduino_Teststand.md  # Normgerechtes Lastenheft (VDI 2206 / VDI 2221)
 ├── Deterministischer_Automat_Dokumentation.md      # Formale DFA/FSM-Spezifikation (Zustandsautomat & Tabellen)
 ├── Requirements_Management_Portal.html             # Interaktives Web-Portal zur Verwaltung & Live-Export der Anforderungen

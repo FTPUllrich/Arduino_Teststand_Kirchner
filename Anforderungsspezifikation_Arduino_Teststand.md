@@ -24,27 +24,15 @@ Ein Kunde benötigt zur Überwachung analoger Sensoren ein verteiltes, modulares
 1. **Datenerfassungs-Arduino (Sender / Slave):** Erfasst kontinuierlich analoge Sensorsignale über einen integrierten Analog-Digital-Wandler (10-Bit ADC), glättet die Messwerte in Echtzeit und stellt diese zyklisch über einen Kommunikationsbus bereit.
 2. **Auswertungs- und HMI-Arduino (Empfänger / Master):** Empfängt die berechneten Messwerte über die serielle Schnittstelle. Über einen Hardware-Taster fordert der Benutzer die Anzeige des aktuellen Messwerts an. Die Darstellung erfolgt auf einem LC-Display im 10-Bit-Binärformat (mit strukturierter Nibble-Trennung) sowie im Dezimalformat. Gleichzeitig überwacht das System sprunghafte Messwertänderungen ($\ge 70\,\%$) als Plausibilitätskontrolle und signalisiert diese optisch.
 
-### 1.2 Zielsetzung des Projekts
-Ziel ist die Entwicklung, Dokumentation und Verifikation eines robusten, erweiterbaren Labor-Teststands. Das System muss unempfindlich gegenüber Busunterbrechungen sein, definierte Einschaltzustände besitzen und nach den Qualitätskriterien für mechatronische Spezifikationen (eindeutige Referenzgrößen, überprüfbare Akzeptanzkriterien, vollständige Fehlerbehandlung) aufgebaut werden.
+### 1.3 Glossar & Begriffsdefinitionen (gemäß Checkliste Kriterium 4)
+Zur Vermeidung von Missverständnissen und unklarem Fachjargon gelten im gesamten Dokument folgende verbindliche Definitionen:
 
-```
-+---------------------------------------------------------------------------------------------------------+
-|                                              GESAMTSYSTEM                                               |
-|                                                                                                         |
-|   +-----------------------+                         UART-Bus                         +---------------+  |
-|   |  Datenerfassungs-     |  TX (Pin 1 / D2)  ====================>  RX (Pin 0 / D3) | Auswertungs-  |  |
-|   |  Arduino (Sender)     |                                                          | Arduino (HMI) |  |
-|   +-----------------------+  GND (0V)         --------------------   GND (0V)        +---------------+  |
-|          ^         ^                                                                     |       |      |
-|          |         |                                                             I2C Bus |       |      |
-|   +----------+ +-------+                                                             (A4/A5) |       |      |
-|   | Analog-  | | +5V / |                                                                 v       v      |
-|   | sensor   | | GND   |                                                            +---------+ +-----+ |
-|   | (Poti)   | +-------+                                                            | LCD     | |Taste| |
-|   +----------+                                                                      | 20x4    | |(D4) | |
-|                                                                                     +---------+ +-----+ |
-+---------------------------------------------------------------------------------------------------------+
-```
+* **Hold-Modus:** Betriebsart der HMI-Anzeige, bei der der zuletzt übernommene Messwert statisch eingefroren bleibt, bis durch eine erneute, bewusste Tastenbetätigung ein neuer Messwert eingelesen wird.
+* **Moving Average (Gleitender Mittelwert):** Zeitdiskretes Filterverfahren, bei dem der arithmetische Durchschnitt der letzten $N$ aufeinanderfolgenden Abtastwerte berechnet wird, um Signalrauschen zu unterdrücken.
+* **Nibble:** Eine 4-Bit-Gruppe (Halbbyte). Dient in der HMI-Anzeige der optischen Gliederung des 10-Bit-Binärwertes zur schnellen Ablesbarkeit (`bb bbbb bbbb`).
+* **Watchdog-Timeout:** Zeitgesteuerte Sicherheitsüberwachung. Bleibt ein zyklisches Telegramm länger als eine definierte Maximalzeit aus, wechselt das System automatisch in einen sicheren Fehlerzustand.
+* **Auto-Recovery:** Automatisches Zurücksetzen eines Fehlerzustands und Wiederaufnahme des Normalbetriebs, sobald die Ursache der Störung (z. B. Leitungsunterbrechung) behoben ist.
+* **Nullpunktsschutz:** Mathematische Absicherung der relativen Abweichungsberechnung bei Bezugswerten nahe $0\,\text{V}$ ($< 10\,\text{Digits}$), um Divisionen durch Null und Rauschalarme zu verhindern.
 
 ---
 
@@ -52,15 +40,15 @@ Ziel ist die Entwicklung, Dokumentation und Verifikation eines robusten, erweite
 
 ### 2.1 Teilsystem 1: Datenerfassungs-Arduino (Sender)
 * **Funktion:** Kontinuierliche Signalabtastung, Rauschunterdrückung durch gleitenden Mittelwert, zyklische Telegrammübertragung via UART.
-* **Hardware:** Arduino Uno R3 (ATmega328P, 16 MHz, 5 V Logikpegel).
+* **Hardware:** Arduino Uno R4 Minima / WiFi (Renesas RA4M1, 32-Bit ARM Cortex-M4, 48 MHz, 5 V Logikpegel).
 * **Eingänge:** Analogeingang `A0` (erweiterbar auf `A1`–`A5`), Messbereich $0{,}0\,\text{V} \dots 5{,}0\,\text{V}$ DC ($0 \dots 1023\,\text{Digits}$).
-* **Ausgänge:** UART-TX (Hardware-UART `Pin 1` oder SoftwareSerial `Pin D2`), Baudrate: $9600\,\text{Baud}$ (konfigurierbar bis $115200\,\text{Baud}$).
+* **Ausgänge:** UART-TX (Hardware-UART `Serial1`, `Pin 1`), Baudrate: $9600\,\text{Baud}$ (konfigurierbar bis $115200\,\text{Baud}$).
 
 ### 2.2 Teilsystem 2: Auswertungs- & HMI-Arduino (Empfänger)
 * **Funktion:** Serieller Datenempfang, Plausibilitätsprüfung (Sprungüberwachung $\ge 70\,\%$), Tasterentprellung, Hold-Messwertspeicherung, Ansteuerung des LCD 20×4 via I2C, Verbindungsüberwachung (Timeout $> 2\,\text{s}$).
-* **Hardware:** Arduino Uno R3 (ATmega328P, 16 MHz, 5 V Logikpegel).
+* **Hardware:** Arduino Uno R4 Minima / WiFi (Renesas RA4M1, 32-Bit ARM Cortex-M4, 48 MHz, 5 V Logikpegel).
 * **Eingänge:**
-  * UART-RX (`Pin 0` bzw. `Pin D3`), Empfang der gefilterten Messwerte.
+  * UART-RX (Hardware-UART `Serial1`, `Pin 0`), Empfang der gefilterten Messwerte.
   * Digitaler Taster-Eingang `Pin D4` (mit internem Pull-Up-Widerstand, active LOW) zur Messwertübernahme (Hold-Trigger).
 * **Ausgänge:** I2C-Schnittstelle (`SDA` an `Pin A4`, `SCL` an `Pin A5`, 100 kHz Standard Mode) zur Ansteuerung des LCD-Backpacks (PCF8574, I2C-Adresse `0x27` oder `0x3F`).
 
@@ -73,12 +61,12 @@ Ziel ist die Entwicklung, Dokumentation und Verifikation eines robusten, erweite
 | Baugruppe | Komponente | Arduino-Pin | Signal / Funktion | Elektrischer Pegel | Spezifikation / Bemerkung |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Sender-Arduino** | Analogsensor (Poti) | `Pin A0` | Analog IN (Messgröße) | $0 \dots 5\,\text{V}$ DC | 10-Bit ADC ($0 \dots 1023\,\text{Digits}$), Ri $\approx 10\,\text{k}\Omega$ |
-| **Sender-Arduino** | UART TX | `Pin 1` / `D2` | Serielle Datenübertragung | 5 V TTL (zyklisch $\ge 10\,\text{Hz}$) | Verbindung zu RX des Empfänger-Arduinos |
+| **Sender-Arduino** | UART TX | `Pin 1` (Serial1) | Serielle Datenübertragung | 5 V TTL (zyklisch $\ge 10\,\text{Hz}$) | Verbindung zu RX des Empfänger-Arduinos |
 | **Sender-Arduino** | Spannungsversorgung | `5V` / `GND` | Betriebsspannung | $+5\,\text{V}$ DC / $0\,\text{V}$ | Gemeinsame Masse mit Gesamtsystem |
-| **Empfänger-Arduino** | UART RX | `Pin 0` / `D3` | Serieller Datenempfang | 5 V TTL | Empfang des gleitenden Mittelwerts |
+| **Empfänger-Arduino** | UART RX | `Pin 0` (Serial1) | Serieller Datenempfang | 5 V TTL | Empfang des gleitenden Mittelwerts |
 | **Empfänger-Arduino** | I2C LCD Backpack | `Pin A4` (SDA) | I2C Datenleitung | 5 V TTL (Pull-Up) | Standardadresse `0x27` oder `0x3F` |
 | **Empfänger-Arduino** | I2C LCD Backpack | `Pin A5` (SCL) | I2C Taktleitung | 5 V TTL (Pull-Up) | Taktfrequenz $100\,\text{kHz}$ |
-| **Empfänger-Arduino** | Aktualisierungs-Taster | `Pin D4` (od. `D2`) | Digital IN (Hold-Trigger) | Active LOW (`INPUT_PULLUP`) | Entprellzeit $t_{\text{deb}} \ge 50\,\text{ms}$ |
+| **Empfänger-Arduino** | Aktualisierungs-Taster | `Pin D4` | Digital IN (Hold-Trigger) | Active LOW (`INPUT_PULLUP`) | Entprellzeit $t_{\text{deb}} \ge 50\,\text{ms}$ |
 | **Gesamtsystem** | Potenzialausgleich | `GND - GND` | Gemeinsame Bezugsmasse | $0\,\text{V}$ | Zwingend für Signalintegrität |
 
 ---
@@ -89,23 +77,23 @@ Ziel ist die Entwicklung, Dokumentation und Verifikation eines robusten, erweite
 > * **F = Festforderung (Muss-Kriterium):** Zwingend für die Abnahme erforderlich.
 > * **W = Wunschforderung (Soll-/Kann-Kriterium):** Vorgesehen für Skalierungsphase 2.
 
-| ID | Kategorie | Anforderung / Spezifikation | Art | Zielwert / Akzeptanzkriterium | Verifikationsmethode (Abnahmetest) | Prio |
+| ID | Kategorie | Anforderung / Spezifikation (WAS) | Art | Zielwert / Akzeptanzkriterium | Verifikationsmethode (Abnahmetest) | Prio |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **A-01** | Sensorik & Erfassung | **Analoge Eingangserfassung** | **F** | Erfassung eines kontinuierlichen Analogsignals über 10-Bit-ADC ($0 \dots 1023\,\text{Digits} \hat{=} 0{,}00 \dots 5{,}00\,\text{V}$) an Analogeingang `A0`. Linearitätsfehler $\le \pm 2\,\text{LSB}$. | Kalibrierte DC-Spannungsquelle & Digitalmultimeter (DMM) | Hoch |
-| **A-02** | Signalverarbeitung | **Rauschunterdrückung & Glättung** | **F** | Berechnung des gleitenden arithmetischen Mittelwerts über exakt $N = 10$ aufeinanderfolgende Samples. Abtastintervall $\Delta t = 50\,\text{ms} \pm 2\,\text{ms}$ (Abtastrate $20\,\text{Hz}$). | Signalvergleich Roh- vs. Filterwert im Arduino Serial Plotter bei verrauschtem Signal | Hoch |
-| **A-03** | Systemskalierung | **Erweiterbarkeit der Eingangskanäle** | **W** | Hard- und Softwarearchitektur ausgelegt für modulare Erweiterung auf bis zu 6 Analogkanäle (`A0`–`A5`). | Funktionstest mit bis zu 6 analogen Signalgebern | Mittel |
-| **A-04** | Kommunikation | **Zyklische Bus-Datenübertragung** | **F** | Zyklische Übertragung des gemittelten Werts via UART-Bus mit einer Übertragungsrate $f_{\text{bus}} \ge 10\,\text{Hz}$ (Intervall $\le 100\,\text{ms}$). Baudrate $9600\,\text{Baud}$, 8N1, mit Framing `<VAL:xxxx;RAW:xxxx\n>`. | Logikanalysator / Serial-Monitor-Trace mit Zeitstempeln | Hoch |
-| **A-05** | Systemrobustheit | **Bus-Timeout & Verbindungsüberwachung** | **F** | Automatische Erkennung eines Signal- oder Telegrammausfalls. Bei Ausbleiben gültiger Daten für $t_{\text{timeout}} > 2{,}0\,\text{s}$ muss eine Fehlermeldung auf dem LCD ausgegeben werden. | Unterbrechung der RX/TX-Signalleitung im laufenden Betrieb | Hoch |
-| **A-06** | HMI / Display | **LC-Display Ansteuerung via I2C** | **F** | Anbindung eines HD44780-kompatiblen LC-Displays (20 Zeichen × 4 Zeilen) über I2C-Backpack (PCF8574). I2C-Busfrequenz $100\,\text{kHz}$. | I2C-Bus-Scan / Hardwaretest mit Oszilloskop | Hoch |
-| **A-07** | HMI / Format | **Binäre Messwertdarstellung** | **F** | Formatierte 10-Bit-Binärausgabe mit führenden Nullen und 4-Bit-Nibble-Strukturierung (Format: `BIN: bb bbbb bbbb`). | Sichtprüfung der LCD-Anzeige über den gesamten Stellbereich ($0 \dots 1023$) | Mittel |
-| **A-08** | HMI / Bedienung | **Messwert-Aktualisierung (Hold-Trigger)** | **F** | Aktualisierung des Anzeigewerts ausschließlich bei Betätigung des Tasters (Hold-Funktion bis zum nächsten Druck). Software-Entprellzeit $t_{\text{deb}} \ge 50\,\text{ms}$. | Prellprüfung / Funktionstest mit Oszilloskop am Tastereingang | Hoch |
-| **A-09** | Systemdynamik | **Reaktionszeit HMI-Aktualisierung** | **F** | Latenzzeit zwischen Tasterbetätigung (fallende Flanke) und vollständiger Aktualisierung des LCD-Inhalts $t_{\text{lat}} \le 100\,\text{ms}$. | 2-Kanal-Oszilloskop (Trigger Flanke Taster $\rightarrow$ erstes I2C-Paket zum Display) | Mittel |
-| **A-10** | Systemstart | **Definiertes Initialisierungsverhalten** | **F** | Nach Kaltstart (Power-On): Ausgabe Boot-Screen (2 s), Vorbefüllung des $N=10$ Ringpuffers, Einnahme eines definierten Wartezustands (`MOD: INIT / WAIT TASTE`). | Einschaltprüfung / Kaltstart-Zyklus mit Netztrennung | Mittel |
-| **A-11** | Logik & Alarm | **Plausibilitäts- & Grenzwertüberwachung** | **F** | Optischer Alarm auf dem LCD (`DEV: +xx.x% [ALARM]`), wenn die relative Änderung $\|Wert_k - Wert_{k-1}\| \ge 0{,}70 \cdot Wert_{k-1}$ beträgt. Bei $Wert_{k-1} < 10\,\text{Digits}$ greift eine Mindest-Absolutschwelle von $\|\Delta\| \ge 50\,\text{Digits}$. | Sprungantwort-Test mit Rechteck-Signalgenerator / Spannungssprung am Poti | Hoch |
-| **A-12** | Logik & Alarm | **Alarm-Rücksetzung / Quittierung** | **F** | Der optische Alarmzustand bleibt aktiv, bis ein neuer Messwert innerhalb des Toleranzbereichs ($< 70\,\%$) per Tastendruck übernommen wird. | Stufentest mit Rückkehr in den Nennbereich | Hoch |
-| **A-13** | Datenspeicher | **Direkter Datenzugriff im Speicher** | **F** | Strukturierte Vorhaltung von aktuellem Messwert ($Wert_k$), Vorgängerwert ($Wert_{k-1}$), Filterpuffer und Systemstatus-Flags im flüchtigen SRAM. | Code-Review & RAM-Belegungsanalyse via Compiler / Debug-Ausgabe | Hoch |
-| **A-14** | Elektrik & Schutz | **Betriebsspannung & Schutzbeschaltung** | **F** | Versorgungsspannung $+5{,}0\,\text{V}\,\text{DC} \pm 5\,\%$. Schutz vor Kurzschluss und undefinierten Pegeln durch interne Pull-Up-Widerstände an allen Digitaleingängen. | DMM-Spannungsmessung & Verifikationsprüfung offener Pins | Hoch |
-| **A-15** | Umgebungsbed. | **Betriebsumgebung & Laborbetrieb** | **F** | Zulässiger Betriebstemperaturbereich $+10\,^\circ\text{C} \dots +40\,^\circ\text{C}$, relative Luftfeuchtigkeit $20\,\% \dots 80\,\%$ (nicht kondensierend), Schutzart IP20 (Laboraufbau). | Sicht- und Funktionsprüfung unter Laborbedingungen | Niedrig |
+| **A-01** | Sensorik & Erfassung | **Analoge Eingangserfassung:** Kontinuierliche Erfassung eines analogen DC-Signals ($0 \dots 5{,}00\,\text{V}$) über 10-Bit-Quantisierung ($0 \dots 1023\,\text{Digits}$). | **F** | Linearitätsfehler $\le \pm 2\,\text{LSB}$ über gesamten Eingangsbereich. | Kalibrierte DC-Spannungsquelle & Digitalmultimeter (DMM) | Hoch |
+| **A-02** | Signalverarbeitung | **Rauschunterdrückung & Glättung:** Zeitdiskrete Glättung des Eingangssignals mittels gleitendem arithmetischem Mittelwert über genau $N = 10$ aufeinanderfolgende Messpunkte. | **F** | Abtastintervall $\Delta t = 50\,\text{ms} \pm 2\,\text{ms}$ (Abtastrate $20\,\text{Hz}$). | Signalvergleich Roh- vs. Filterwert im Arduino Serial Plotter | Hoch |
+| **A-03** | Systemskalierung | **Erweiterbarkeit der Eingangskanäle:** Systemarchitektur muss für die synchrone Erfassung von bis zu 6 analogen Signalgebern modular erweiterbar sein. | **W** | Hardware- und Softwaredesign unterstützt Kanäle `A0`–`A5`. | Funktionstest mit bis zu 6 analogen Signalgebern | Mittel |
+| **A-04** | Kommunikation | **Zyklische Bus-Datenübertragung:** Unaufgeforderte, zyklische Übertragung des berechneten Messwerts und des Rohwerts über eine serielle Punkt-zu-Punkt-Busverbindung. | **F** | Übertragungsrate $f_{\text{bus}} \ge 10\,\text{Hz}$ (Intervall $\le 100\,\text{ms}$), Telegramm: `<VAL:xxxx;RAW:xxxx>\n` bei $9600\,\text{Baud}$ 8N1. | Logikanalysator / Serial-Monitor-Trace mit Zeitstempeln | Hoch |
+| **A-05** | Systemrobustheit | **Bus-Timeout & Verbindungsüberwachung:** Selbstständige Erkennung eines Kommunikationsausfalls mit optischer Warnanzeige und automatischem Wiederanlauf bei Signalrückkehr. | **F** | Wechsel in Fehlermodus bei Telegrammausfall $> 2{,}0\,\text{s}$; Wiederanlaufzeit nach Signalwiederkehr $\le 200\,\text{ms}$. | Unterbrechung der RX/TX-Signalleitung im laufenden Betrieb | Hoch |
+| **A-06** | HMI / Display | **Messwert-Visualisierung:** Strukturierte 4-zeilige Monospace-Textanzeige zur simultanen Darstellung von Binärwert, Dezimalwert, Abweichung und Systemstatus. | **F** | 4 Zeilen à 20 Zeichen, serielle 2-Draht-Ansteuerung mit Busfrequenz $100\,\text{kHz}$. | I2C-Bus-Scan / Hardwaretest mit Oszilloskop | Hoch |
+| **A-07** | HMI / Format | **Binäre Messwertdarstellung:** Formatierte 10-Bit-Binärausgabe mit führenden Nullen und optischer 4-Bit-Nibble-Trennung auf Zeile 1 des Displays. | **F** | Formatierung exakt: `BIN: bb bbbb bbbb` über vollen Bereich ($0 \dots 1023$). | Sichtprüfung der LCD-Anzeige über den gesamten Stellbereich | Mittel |
+| **A-08** | HMI / Bedienung | **Messwert-Übernahme (Hold-Funktion):** Aktualisierung der Displayanzeige ausschließlich bei gezielter Betätigung des Bedientasters; dauerhaftes Halten des Anzeigewerts bis zum Folgeimpuls. | **F** | Sichere Unterdrückung von Kontaktprellen mit Entprellzeit $t_{\text{deb}} \ge 50\,\text{ms}$. | Prellprüfung / Funktionstest mit Oszilloskop am Tastereingang | Hoch |
+| **A-09** | Systemdynamik | **Reaktionszeit HMI-Aktualisierung:** Zeitverzögerung zwischen Tasterbetätigung (fallende Flanke) und vollständiger Aktualisierung des Displayinhalts. | **F** | Gesamtlatenzzeit $t_{\text{lat}} \le 100\,\text{ms}$. | 2-Kanal-Oszilloskop (Trigger Flanke Taster $\rightarrow$ I2C-Paket) | Mittel |
+| **A-10** | Systemstart | **Definiertes Initialisierungsverhalten:** Deterministischer Kaltstart-Ablauf mit Begrüßungsanzeige, Filter-Vorbefüllung und Einnahme eines sicheren Wartezustands. | **F** | Boot-Screen $2{,}0\,\text{s} \pm 0{,}1\,\text{s}$, Vorbefüllung $N=10$, Status: `MOD: WAIT TASTE`. | Einschaltprüfung / Kaltstart-Zyklus mit Netztrennung | Mittel |
+| **A-11** | Logik & Alarm | **Plausibilitäts- & Grenzwertüberwachung:** Erkennung und optische Signalisierung unplausibler Signalsprünge ($\ge 70\,\%$) im Vergleich zum vorhergehenden Messwert. | **F** | Optischer Alarm `DEV: +xx.x% [ALARM]` bei $|\Delta_{\text{rel}}| \ge 70{,}0\,\%$; Nullpunktsschwelle $|\Delta| \ge 50\,\text{Digits}$ bei Referenzwerten $< 10\,\text{Digits}$. | Sprungantwort-Test mit Spannungssprung am Poti | Hoch |
+| **A-12** | Logik & Alarm | **Alarm-Rücksetzung & Quittierung:** Der optische Alarmzustand bleibt solange aktiv, bis ein neuer Messwert innerhalb des zulässigen Toleranzbereichs ($< 70\,\%$) per Taster bestätigt wird. | **F** | Rücksetzung des Alarmstatus auf `[OK]` bei nachfolgendem Messwert im Nennbereich. | Stufentest mit Rückkehr in den Toleranzbereich | Hoch |
+| **A-13** | Datenspeicher | **Messwert- & Referenzwertpufferung:** Unterbrechungsfreie Vorhaltung von aktuellem Messwert, vorhergehendem Referenzwert und Filterhistorie zur Laufzeit. | **F** | Verzögerungsfreie Bereitstellung aller Operanden im Arbeitsspeicher für die Plausibilitätsberechnung. | Code-Review & Verifikation des deterministischen Speicherverhaltens | Hoch |
+| **A-14** | Elektrik & Schutz | **Betriebsspannung & Signalintegrität:** Sichere Funktion bei Nennspannung $+5{,}0\,\text{V}\,\text{DC}$ mit Schutz gegen offene/schwebende Eingangspotenziale. | **F** | Spannungsbereich $+5{,}0\,\text{V} \pm 5\,\%$, definierte High-Pegel an allen Schalteingängen im Ruhezustand. | DMM-Spannungsmessung & Verifikationsprüfung offener Pins | Hoch |
+| **A-15** | Umgebungsbed. | **Betriebsumgebung & Laborbetrieb:** Zuverlässiger Betrieb unter Standard-Labor- und Schulungsbedingungen. | **F** | Umgebungstemperatur $+10\,^\circ\text{C} \dots +40\,^\circ\text{C}$, relative Feuchte $20\,\% \dots 80\,\%$ (nicht kondensierend), Schutzart IP20. | Sicht- und Funktionsprüfung unter Laborbedingungen | Niedrig |
 
 ---
 
