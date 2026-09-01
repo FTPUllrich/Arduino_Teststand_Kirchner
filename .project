@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Arduino_Teststand_Kirchner</name>
+	<comment>Mikrocontroller-Teststand fuer analoge Messwerterfassung (VDI 2206)</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+		<nature>org.polarsys.capella.project.nature</nature>
+	</natures>
+</projectDescription>
