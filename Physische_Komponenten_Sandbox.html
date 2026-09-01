@@ -278,15 +278,17 @@
         </div>
 
         <!-- Visuelle Busverbindungs-Leiste (Mitte) -->
-        <div class="mt-6 p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 text-xs font-mono">
-          <div class="flex items-center gap-2 text-emerald-400 font-semibold">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            UART Inter-Arduino Bus: 5V TTL (9600 Baud)
+        <div class="mt-6 p-3 bg-slate-950/90 border border-slate-800 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs font-mono">
+          <div class="flex items-center gap-2 text-emerald-400 font-semibold bg-slate-900/80 px-3 py-2 rounded-lg border border-slate-800/80">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>UART Bus: 5V TTL (9600 Baud)</span>
           </div>
-          <div class="flex items-center gap-2 text-amber-300 bg-slate-900 px-3 py-1 rounded border border-slate-800">
-            Telegramm: <code>&lt;VAL:xxxx;RAW:xxxx&gt;\n</code> (10 Hz Zyklus)
+          <div class="flex items-center justify-center gap-2 text-amber-300 bg-slate-900/80 px-3 py-2 rounded-lg border border-slate-800/80">
+            <span class="text-slate-400">Telegramm:</span>
+            <code class="text-amber-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">&lt;VAL:xxxx;RAW:xxxx&gt;</code>
+            <span class="text-[11px] text-slate-500">(10 Hz)</span>
           </div>
-          <div class="text-rose-400 font-bold flex items-center gap-1.5">
+          <div class="flex items-center md:justify-end gap-1.5 text-rose-400 font-bold bg-slate-900/80 px-3 py-2 rounded-lg border border-slate-800/80">
             <span>⚡ Zwingende GND-Kopplung</span>
           </div>
         </div>
