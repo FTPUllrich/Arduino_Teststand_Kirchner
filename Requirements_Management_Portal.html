@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirements Management Portal – Arduino Teststand</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="bg-[#0b1120] text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- ======================================================================= -->
+  <!-- TOPBAR / NAVIGATION -->
+  <!-- ======================================================================= -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white leading-none">Requirements Management Portal</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono">VDI 2206 / Capella Hub</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">2× Arduino UNO R4 Teststand • Werner-von-Siemens-Schule</p>
+        </div>
+      </div>
+
+      <!-- Schnell-Aktionen (Export & File Links) -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openNewReqModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Neue Anforderung
+        </button>
+        <button onclick="exportReqIF()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Export ReqIF
+        </button>
+        <button onclick="exportCSV()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- HAUPTINHALT -->
+  <!-- ======================================================================= -->
+  <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-1 flex flex-col gap-6">
+
+    <!-- KPI / METRIKEN LEISTE -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-medium">Gesamtanforderungen</span>
+        <div class="text-2xl font-bold text-white mt-1" id="kpiTotal">15</div>
+        <span class="text-[11px] text-cyan-400 mt-0.5 block">14 Fest / 1 Wunsch</span>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-medium">Verifikationsstatus</span>
+        <div class="text-2xl font-bold text-emerald-400 mt-1" id="kpiVerified">100%</div>
+        <span class="text-[11px] text-slate-400 mt-0.5 block">7 von 7 Testfällen bestanden</span>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-medium">Architektur-Knoten</span>
+        <div class="text-2xl font-bold text-blue-400 mt-1">2× UNO R4</div>
+        <span class="text-[11px] text-slate-400 mt-0.5 block">Sender & Empfänger (Serial1)</span>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 shadow">
+        <span class="text-xs text-slate-400 font-medium">System-Compliance</span>
+        <div class="text-2xl font-bold text-indigo-400 mt-1">VDI 2206</div>
+        <span class="text-[11px] text-slate-400 mt-0.5 block">Systemebene / Capella MBSE</span>
+      </div>
+    </div>
+
+    <!-- FILTER & SUCHE -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div class="relative w-full md:w-80">
+        <svg class="w-4 h-4 absolute left-3.5 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Anforderung suchen (ID, Text, Parameter)..." 
+               class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors">
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <!-- Kategorie Filter -->
+        <select id="filterCat" onchange="applyFilters()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
+          <option value="all">Alle Kategorien</option>
+          <option value="Sensorik">Sensorik & Erfassung</option>
+          <option value="Signalverarbeitung">Signalverarbeitung</option>
+          <option value="Kommunikation">Kommunikation</option>
+          <option value="HMI">HMI / Display & Taster</option>
+          <option value="Logik">Logik & Alarm</option>
+          <option value="System">System & Schutz</option>
+        </select>
+
+        <!-- Prio Filter -->
+        <select id="filterPrio" onchange="applyFilters()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
+          <option value="all">Alle Prioritäten</option>
+          <option value="Hoch">Priorität: Hoch</option>
+          <option value="Mittel">Priorität: Mittel</option>
+          <option value="Niedrig">Priorität: Niedrig</option>
+        </select>
+
+        <!-- Art Filter -->
+        <select id="filterArt" onchange="applyFilters()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-cyan-500">
+          <option value="all">Alle Arten (F / W)</option>
+          <option value="F">Festforderung (F)</option>
+          <option value="W">Wunschforderung (W)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ANFORDERUNGS-TABELLE -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-950 border-b border-slate-800 text-slate-400 font-mono uppercase text-[11px]">
+              <th class="py-3.5 px-4 font-semibold w-24">Req-ID</th>
+              <th class="py-3.5 px-4 font-semibold w-36">Kategorie</th>
+              <th class="py-3.5 px-4 font-semibold">Titel & Spezifikation</th>
+              <th class="py-3.5 px-4 font-semibold">Zielwert / Akzeptanzkriterium</th>
+              <th class="py-3.5 px-4 font-semibold w-24">Prio</th>
+              <th class="py-3.5 px-4 font-semibold w-28">Status</th>
+              <th class="py-3.5 px-4 font-semibold w-20 text-center">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="reqTableBody" class="divide-y divide-slate-800/80">
+            <!-- Dynamisch durch JavaScript befüllt -->
+          </tbody>
+        </table>
+      </div>
+      <div class="p-3 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+        <span id="rowCountLabel">Zeige 15 Anforderungen</span>
+        <span class="text-[11px] font-mono text-slate-500">Klick auf eine Zeile öffnet die Detailansicht</span>
+      </div>
+    </div>
+
+    <!-- DATEIEN & SCHNITTSTELLEN SCHNELLZUGRIFF -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+      <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+        Direkter Zugriff auf alle Projekt-Dateien
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <a href="Anforderungsspezifikation_Arduino_Teststand.md" class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-950 transition-all flex items-center gap-2.5 group">
+          <span class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">📄</span>
+          <div>
+            <span class="font-bold text-white group-hover:text-cyan-400 block transition-colors">Lastenheft (MD)</span>
+            <span class="text-[10px] text-slate-400">VDI 2206 Spezifikation</span>
+          </div>
+        </a>
+
+        <a href="Anforderungen_Arduino_Teststand.reqif" class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-950 transition-all flex items-center gap-2.5 group">
+          <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">📦</span>
+          <div>
+            <span class="font-bold text-white group-hover:text-cyan-400 block transition-colors">Capella ReqIF</span>
+            <span class="text-[10px] text-slate-400">OMG Standard-Modell</span>
+          </div>
+        </a>
+
+        <a href="Teststand_Sandbox_Simulation.html" target="_blank" class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-950 transition-all flex items-center gap-2.5 group">
+          <span class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">🧪</span>
+          <div>
+            <span class="font-bold text-white group-hover:text-cyan-400 block transition-colors">Prozess-Sandbox</span>
+            <span class="text-[10px] text-slate-400">Live-Simulation mit Scope</span>
+          </div>
+        </a>
+
+        <a href="Physische_Komponenten_Sandbox.html" target="_blank" class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 hover:bg-slate-950 transition-all flex items-center gap-2.5 group">
+          <span class="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">🏛️</span>
+          <div>
+            <span class="font-bold text-white group-hover:text-cyan-400 block transition-colors">Physisches Board</span>
+            <span class="text-[10px] text-slate-400">Hardware-Architektur</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL: DETAIL- & BEARBEITUNGS-DRAWER -->
+  <!-- ======================================================================= -->
+  <div id="editModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <span id="modalReqIdBadge" class="px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-400 font-mono font-bold text-xs">A-01</span>
+          <h3 class="font-bold text-white text-base" id="modalTitle">Anforderung bearbeiten</h3>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="py-4 space-y-3.5 overflow-y-auto custom-scrollbar flex-1 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Req-ID:</label>
+            <input type="text" id="m_id" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Kategorie:</label>
+            <input type="text" id="m_cat" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Titel der Anforderung:</label>
+          <input type="text" id="m_title" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-semibold">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Spezifikation (Beschreibung):</label>
+          <textarea id="m_desc" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 leading-relaxed"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Zielwert / Akzeptanzkriterium:</label>
+          <input type="text" id="m_target" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Verifikationsmethode (Testfall):</label>
+          <input type="text" id="m_verif" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Klassifizierung:</label>
+            <select id="m_art" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
+              <option value="F">Festforderung (F)</option>
+              <option value="W">Wunschforderung (W)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Priorität:</label>
+            <select id="m_prio" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
+              <option value="Hoch">Hoch</option>
+              <option value="Mittel">Mittel</option>
+              <option value="Niedrig">Niedrig</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Status:</label>
+            <select id="m_status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-semibold">
+              <option value="Verifiziert">✅ Verifiziert</option>
+              <option value="In Prüfung">🔄 In Prüfung</option>
+              <option value="Freigegeben">📋 Freigegeben</option>
+              <option value="Entwurf">📝 Entwurf</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+        <button onclick="deleteCurrentReq()" id="btnDeleteReq" class="px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 font-semibold hover:bg-rose-950/30 rounded-lg transition-colors">
+          Löschen
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors">
+            Abbrechen
+          </button>
+          <button onclick="saveModalReq()" class="px-4 py-2 text-xs font-semibold text-slate-950 bg-cyan-500 hover:bg-cyan-400 rounded-xl shadow transition-colors">
+            Speichern
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DATEN & VERWALTUNGSLOGIK -->
+  <script>
+    let requirements = [
+      { id: 'A-01', cat: 'Sensorik & Erfassung', title: 'Analoge Eingangserfassung', desc: 'Erfassung eines kontinuierlichen Analogsignals über 10-Bit-ADC (0..1023 Digits = 0..5V) an Analogeingang A0.', target: 'Linearitätsfehler ≤ ±2 LSB', verif: 'Kalibrierte DC-Spannungsquelle & DMM', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-02', cat: 'Signalverarbeitung', title: 'Rauschunterdrückung & Glättung', desc: 'Berechnung des gleitenden arithmetischen Mittelwerts über exakt N=10 aufeinanderfolgende Samples.', target: 'Abtastintervall Δt=50ms ± 2ms (20 Hz)', verif: 'Signalvergleich Roh- vs. Filterwert im Serial Plotter', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-03', cat: 'Systemskalierung', title: 'Erweiterbarkeit der Eingangskanäle', desc: 'Hard- und Softwarearchitektur ausgelegt für modulare Erweiterung auf bis zu 6 Analogkanäle (A0-A5).', target: 'Architektur unterstützt A0..A5', verif: 'Funktionstest mit bis zu 6 analogen Signalgebern', art: 'W', prio: 'Mittel', status: 'Freigegeben' },
+      { id: 'A-04', cat: 'Kommunikation', title: 'Zyklische Bus-Datenübertragung', desc: 'Zyklische Übertragung des gemittelten Werts via UART-Bus (Serial1) mit Framing <VAL:xxxx;RAW:xxxx>.', target: 'Übertragungsrate f_bus ≥ 10 Hz (Intervall ≤ 100ms), 9600 Baud 8N1', verif: 'Logikanalysator / Serial-Trace mit Zeitstempeln', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-05', cat: 'Systemrobustheit', title: 'Bus-Timeout & Verbindungsüberwachung', desc: 'Automatische Erkennung eines Signal- oder Telegrammausfalls mit LCD-Warnmeldung und Auto-Recovery.', target: 'Fehlermeldung auf LCD bei Ausfall > 2.0 s', verif: 'Unterbrechung der RX/TX-Signalleitung im laufenden Betrieb', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-06', cat: 'HMI / Display', title: 'LC-Display Ansteuerung via I2C', desc: 'Anbindung eines HD44780-kompatiblen LC-Displays (20 Zeichen x 4 Zeilen) über I2C-Backpack (PCF8574).', target: 'I2C-Busfrequenz 100 kHz, Adresse 0x27 / 0x3F', verif: 'I2C-Bus-Scan / Hardwaretest mit Oszilloskop', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-07', cat: 'HMI / Format', title: 'Binäre Messwertdarstellung', desc: 'Formatierte 10-Bit-Binärausgabe mit führenden Nullen und 4-Bit-Nibble-Strukturierung (BIN: bb bbbb bbbb).', target: 'Formatierung BIN: bb bbbb bbbb auf Zeile 1', verif: 'Sichtprüfung der LCD-Anzeige über gesamten Stellbereich', art: 'F', prio: 'Mittel', status: 'Verifiziert' },
+      { id: 'A-08', cat: 'HMI / Bedienung', title: 'Messwert-Aktualisierung (Hold-Trigger)', desc: 'Aktualisierung des Anzeigewerts ausschließlich bei Betätigung des Tasters (Hold-Funktion).', target: 'Software-Entprellzeit t_deb ≥ 50 ms', verif: 'Prellprüfung / Funktionstest mit Oszilloskop an Pin D4', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-09', cat: 'Systemdynamik', title: 'Reaktionszeit HMI-Aktualisierung', desc: 'Latenzzeit zwischen Tasterbetätigung (fallende Flanke) und vollständiger LCD-Aktualisierung.', target: 'Latenz t_lat ≤ 100 ms', verif: '2-Kanal-Oszilloskop (Trigger Flanke Taster -> I2C Paket)', art: 'F', prio: 'Mittel', status: 'Verifiziert' },
+      { id: 'A-10', cat: 'Systemstart', title: 'Definiertes Initialisierungsverhalten', desc: 'Nach Kaltstart (Power-On): Boot-Screen (2s), Ringpuffer-Vorbefüllung, definierter Wartezustand.', target: 'Boot-Screen 2s, MOD: WAIT TASTE', verif: 'Einschaltprüfung / Kaltstart-Zyklus mit Netztrennung', art: 'F', prio: 'Mittel', status: 'Verifiziert' },
+      { id: 'A-11', cat: 'Logik & Alarm', title: 'Plausibilitäts- & Grenzwertüberwachung', desc: 'Optischer Alarm auf dem LCD bei relativem Sprung ≥ 70% mit Nullpunktsschutz (|Δ| ≥ 50 Digits).', target: 'Alarm bei |Wert_k - Wert_k-1| ≥ 0.70 * Wert_k-1', verif: 'Sprungantwort-Test mit Signalgenerator / Poti-Sprung', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-12', cat: 'Logik & Alarm', title: 'Alarm-Rücksetzung / Quittierung', desc: 'Der optische Alarmzustand bleibt aktiv, bis ein neuer Messwert innerhalb der Toleranz übernommen wird.', target: 'Alarm-Rücksetzung bei gültigem neuem Tastendruck', verif: 'Stufentest mit Rückkehr in den Nennbereich', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-13', cat: 'Datenspeicher', title: 'Direkter Datenzugriff im Speicher', desc: 'Strukturierte Vorhaltung von aktuellem Messwert, Vorgängerwert, Puffer und Flags im SRAM.', target: 'Vorhaltung im flüchtigen SRAM', verif: 'Code-Review & RAM-Belegungsanalyse via Compiler', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-14', cat: 'Elektrik & Schutz', title: 'Betriebsspannung & Schutzbeschaltung', desc: 'Versorgungsspannung +5.0V DC ± 5%, zwingendes gemeinsames Bezugspotenzial (GND) und Pull-Ups.', target: '+5.0V DC ± 5%, GND-Kopplung zwingend', verif: 'DMM-Spannungsmessung & Verifikationsprüfung', art: 'F', prio: 'Hoch', status: 'Verifiziert' },
+      { id: 'A-15', cat: 'Umgebungsbed.', title: 'Betriebsumgebung & Laborbetrieb', desc: 'Betriebsbereich: +10°C bis +40°C, relative Luftfeuchtigkeit 20%..80% (nicht kondensierend), IP20.', target: 'Laborbetriebsbereich 10..40°C, IP20', verif: 'Sicht- und Funktionsprüfung unter Laborbedingungen', art: 'F', prio: 'Niedrig', status: 'Freigegeben' }
+    ];
+
+    let editingIndex = -1;
+
+    // Tabelle rendern
+    function renderTable(data = requirements) {
+      const tbody = document.getElementById('reqTableBody');
+      tbody.innerHTML = '';
+
+      data.forEach((r, idx) => {
+        const prioColor = r.prio === 'Hoch' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : (r.prio === 'Mittel' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-slate-800 text-slate-400 border-slate-700');
+        const artColor = r.art === 'F' ? 'bg-blue-500/20 text-blue-300' : 'bg-purple-500/20 text-purple-300';
+        const statusColor = r.status === 'Verifiziert' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30';
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition-colors cursor-pointer group';
+        tr.onclick = (e) => {
+          if (!e.target.closest('button')) openEditModal(requirements.indexOf(r));
+        };
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-cyan-400">
+            <span class="flex items-center gap-1.5">
+              <span>${r.id}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded ${artColor} font-mono">${r.art}</span>
+            </span>
+          </td>
+          <td class="py-3 px-4 text-slate-300 font-medium">${r.cat}</td>
+          <td class="py-3 px-4">
+            <span class="font-bold text-white block group-hover:text-cyan-400 transition-colors">${r.title}</span>
+            <span class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">${r.desc}</span>
+          </td>
+          <td class="py-3 px-4 font-mono text-[11px] text-slate-300">${r.target}</td>
+          <td class="py-3 px-4">
+            <span class="text-[10px] px-2 py-0.5 rounded border ${prioColor} font-semibold">${r.prio}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="text-[10px] px-2 py-0.5 rounded border ${statusColor} font-semibold">${r.status || 'Verifiziert'}</span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="openEditModal(${requirements.indexOf(r)})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('rowCountLabel').innerText = `Zeige ${data.length} von ${requirements.length} Anforderungen`;
+    }
+
+    // Filter-Logik
+    function applyFilters() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const cat = document.getElementById('filterCat').value;
+      const prio = document.getElementById('filterPrio').value;
+      const art = document.getElementById('filterArt').value;
+
+      const filtered = requirements.filter(r => {
+        const matchSearch = r.id.toLowerCase().includes(search) || r.title.toLowerCase().includes(search) || r.desc.toLowerCase().includes(search) || r.target.toLowerCase().includes(search);
+        const matchCat = cat === 'all' || r.cat.toLowerCase().includes(cat.toLowerCase());
+        const matchPrio = prio === 'all' || r.prio === prio;
+        const matchArt = art === 'all' || r.art === art;
+        return matchSearch && matchCat && matchPrio && matchArt;
+      });
+
+      renderTable(filtered);
+    }
+
+    // Modal öffnen (Bearbeiten)
+    function openEditModal(index) {
+      editingIndex = index;
+      const r = requirements[index];
+      document.getElementById('modalReqIdBadge').innerText = r.id;
+      document.getElementById('modalTitle').innerText = 'Anforderung bearbeiten';
+      document.getElementById('btnDeleteReq').classList.remove('hidden');
+
+      document.getElementById('m_id').value = r.id;
+      document.getElementById('m_cat').value = r.cat;
+      document.getElementById('m_title').value = r.title;
+      document.getElementById('m_desc').value = r.desc;
+      document.getElementById('m_target').value = r.target;
+      document.getElementById('m_verif').value = r.verif;
+      document.getElementById('m_art').value = r.art;
+      document.getElementById('m_prio').value = r.prio;
+      document.getElementById('m_status').value = r.status || 'Verifiziert';
+
+      document.getElementById('editModal').classList.remove('hidden');
+      document.getElementById('editModal').classList.add('flex');
+    }
+
+    // Modal öffnen (Neu anlegen)
+    function openNewReqModal() {
+      editingIndex = -1;
+      const nextNum = requirements.length + 1;
+      const nextId = 'A-' + (nextNum < 10 ? '0' : '') + nextNum;
+
+      document.getElementById('modalReqIdBadge').innerText = nextId;
+      document.getElementById('modalTitle').innerText = 'Neue Anforderung erstellen';
+      document.getElementById('btnDeleteReq').classList.add('hidden');
+
+      document.getElementById('m_id').value = nextId;
+      document.getElementById('m_cat').value = 'Sensorik & Erfassung';
+      document.getElementById('m_title').value = '';
+      document.getElementById('m_desc').value = '';
+      document.getElementById('m_target').value = '';
+      document.getElementById('m_verif').value = '';
+      document.getElementById('m_art').value = 'F';
+      document.getElementById('m_prio').value = 'Hoch';
+      document.getElementById('m_status').value = 'Entwurf';
+
+      document.getElementById('editModal').classList.remove('hidden');
+      document.getElementById('editModal').classList.add('flex');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.getElementById('editModal').classList.remove('flex');
+    }
+
+    function saveModalReq() {
+      const updated = {
+        id: document.getElementById('m_id').value,
+        cat: document.getElementById('m_cat').value,
+        title: document.getElementById('m_title').value,
+        desc: document.getElementById('m_desc').value,
+        target: document.getElementById('m_target').value,
+        verif: document.getElementById('m_verif').value,
+        art: document.getElementById('m_art').value,
+        prio: document.getElementById('m_prio').value,
+        status: document.getElementById('m_status').value
+      };
+
+      if (editingIndex >= 0) {
+        requirements[editingIndex] = updated;
+      } else {
+        requirements.push(updated);
+      }
+
+      closeModal();
+      applyFilters();
+    }
+
+    function deleteCurrentReq() {
+      if (editingIndex >= 0 && confirm('Möchten Sie diese Anforderung wirklich löschen?')) {
+        requirements.splice(editingIndex, 1);
+        closeModal();
+        applyFilters();
+      }
+    }
+
+    // CSV Export
+    function exportCSV() {
+      let csv = "Req-ID;Kategorie;Titel;Spezifikation;Zielwert;Verifikationsmethode;Art;Prioritaet;Status\n";
+      requirements.forEach(r => {
+        csv += `"${r.id}";"${r.cat}";"${r.title}";"${r.desc}";"${r.target}";"${r.verif}";"${r.art}";"${r.prio}";"${r.status}"\n`;
+      });
+      downloadFile(csv, "Anforderungen_Arduino_Teststand.csv", "text/csv;charset=utf-8;");
+    }
+
+    // ReqIF Export
+    function exportReqIF() {
+      const now = new Date().toISOString();
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<REQ-IF xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd">
+  <THE-HEADER>
+    <REQ-IF-HEADER IDENTIFIER="reqif-export">
+      <CREATION-TIME>${now}</CREATION-TIME>
+      <TITLE>Mikrocontroller-Teststand Lastenheft</TITLE>
+    </REQ-IF-HEADER>
+  </THE-HEADER>
+  <CORE-CONTENT>
+    <REQ-IF-CONTENT>
+      <SPEC-OBJECTS>`;
+
+      requirements.forEach(r => {
+        xml += `
+        <SPEC-OBJECT IDENTIFIER="${r.id}" LONG-NAME="${r.id}">
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="${r.title}"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="${r.desc}"/>
+          </VALUES>
+        </SPEC-OBJECT>`;
+      });
+
+      xml += `
+      </SPEC-OBJECTS>
+    </REQ-IF-CONTENT>
+  </CORE-CONTENT>
+</REQ-IF>`;
+
+      downloadFile(xml, "Anforderungen_Arduino_Teststand.reqif", "application/xml;charset=utf-8;");
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    window.onload = () => renderTable();
+  </script>
+</body>
+</html>
