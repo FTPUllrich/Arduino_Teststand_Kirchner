@@ -283,10 +283,10 @@
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
             <span>UART Bus: 5V TTL (9600 Baud)</span>
           </div>
-          <div class="flex items-center gap-2 text-amber-300 bg-slate-900/90 px-3 py-2 rounded-lg border border-slate-800 whitespace-nowrap">
-            <span class="text-slate-400">Telegramm:</span>
-            <code class="text-amber-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">&lt;VAL:xxxx;RAW:xxxx&gt;</code>
-            <span class="text-[11px] text-slate-400">(10 Hz)</span>
+          <div class="flex items-center gap-2 text-amber-300 bg-slate-900/90 px-3 py-2 rounded-lg border border-slate-800 whitespace-nowrap" title="VAL = Gleitender Mittelwert (N=10), RAW = Ungefilterter Rohwert (0..1023 Digits)">
+            <span class="text-slate-400">UART-Frame:</span>
+            <code class="text-amber-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">&lt;VAL:0512;RAW:0515&gt;</code>
+            <span class="text-[11px] text-slate-400">(Beispiel bei 2.5V, 10 Hz)</span>
           </div>
           <div class="flex items-center gap-1.5 text-rose-400 font-bold bg-slate-900/90 px-3 py-2 rounded-lg border border-slate-800 whitespace-nowrap">
             <span>⚡ Zwingende GND-Kopplung</span>
