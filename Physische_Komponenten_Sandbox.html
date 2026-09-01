@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physische Komponenten & Systemarchitektur – 2× Arduino UNO R4</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .component-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .component-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.4);
+    }
+    .component-card.active-selected {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4), 0 12px 24px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    /* SVG Wire Animation */
+    .signal-pulse {
+      stroke-dasharray: 8, 8;
+      animation: dashPulse 1.2s linear infinite;
+    }
+    @keyframes dashPulse {
+      to {
+        stroke-dashoffset: -32;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#0b1120] text-slate-100 min-h-screen p-4 md:p-6 antialiased">
+
+  <!-- ======================================================================= -->
+  <!-- HEADER & STEUERUNG -->
+  <!-- ======================================================================= -->
+  <div class="max-w-7xl mx-auto mb-6">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-2xl backdrop-blur">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Physical Architecture Board (Gesprächsgrundlage)</span>
+        </div>
+        <h1 class="text-xl md:text-2xl font-extrabold text-white mt-1">Physische Komponenten & Schnittstellen-Topologie</h1>
+        <p class="text-xs md:text-sm text-slate-400 mt-0.5">2× Arduino UNO R4 Teststand • Werner-von-Siemens-Schule • Hardware- & Verdrahtungsübersicht</p>
+      </div>
+
+      <!-- Ansichtsfilter / Gesprächs-Modi -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs text-slate-400 font-medium mr-1">Fokus:</span>
+        <button onclick="setLayerFilter('all')" id="btnFilter_all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500 text-slate-950 shadow transition-all">
+          Alle Verbindungen
+        </button>
+        <button onclick="setLayerFilter('comm')" id="btnFilter_comm" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+          Bus & Signale (UART / I2C)
+        </button>
+        <button onclick="setLayerFilter('power')" id="btnFilter_power" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
+          Versorgung & Masse (5V / GND)
+        </button>
+        <button onclick="toggleSignalAnimation()" id="btnAnimToggle" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600/40 hover:bg-indigo-600/60 text-indigo-200 border border-indigo-500/40 transition-all flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Signalfluss animieren
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- HAUPT-LAYOUT: VISUELLES SCHALTPLAN-BOARD + DETAIL-PANEL -->
+  <!-- ======================================================================= -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LINKE SPALTE (8 Cols): Grafisches Komponenten-Board -->
+    <div class="lg:col-span-8 flex flex-col gap-6">
+      
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        
+        <!-- Bereichs-Überschriften auf dem Board -->
+        <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-800 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded bg-blue-500/30 border border-blue-400"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-400">Sender-Baugruppe (Datenerfassung)</span>
+          </div>
+          <div class="flex items-center gap-2 justify-end">
+            <span class="w-3 h-3 rounded bg-purple-500/30 border border-purple-400"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Empfänger-Baugruppe (Auswertung & HMI)</span>
+          </div>
+        </div>
+
+        <!-- 2x2 Komponenten-Raster -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- KOMPONENTE 1: SENSOR (POTENTIOMETER) -->
+          <!-- --------------------------------------------------------------- -->
+          <div onclick="selectComponent('poti')" id="card_poti" 
+               class="component-card cursor-pointer bg-slate-950/80 border-2 border-slate-800 rounded-xl p-4 relative group">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">Lineares Potentiometer</h3>
+                  <span class="text-[11px] text-slate-400 font-mono">10 kΩ Drehgeber</span>
+                </div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">Signalquelle</span>
+            </div>
+
+            <!-- Anschlüsse / Pins -->
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-rose-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Pin 1 (VCC)</span>
+                <span class="text-slate-400">→ +5V DC</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-amber-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span> Pin 2 (Schleifer)</span>
+                <span class="text-emerald-400 font-bold">→ Sender Pin A0</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-slate-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Pin 3 (GND)</span>
+                <span class="text-slate-400">→ 0V Masse</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- KOMPONENTE 2: DISPLAY 20x4 MIT I2C BACKPACK -->
+          <!-- --------------------------------------------------------------- -->
+          <div onclick="selectComponent('lcd')" id="card_lcd" 
+               class="component-card cursor-pointer bg-slate-950/80 border-2 border-slate-800 rounded-xl p-4 relative group">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">HD44780 LC-Display 20×4</h3>
+                  <span class="text-[11px] text-slate-400 font-mono">I2C Backpack (PCF8574)</span>
+                </div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">I2C (0x27)</span>
+            </div>
+
+            <!-- Anschlüsse / Pins -->
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-blue-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-400"></span> Pin SDA</span>
+                <span class="text-blue-300 font-bold">→ Empfänger Pin A4</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-indigo-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-400"></span> Pin SCL</span>
+                <span class="text-indigo-300 font-bold">→ Empfänger Pin A5</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-rose-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> VCC / GND</span>
+                <span class="text-slate-400">+5V DC / 0V Masse</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- KOMPONENTE 3: SENDER ARDUINO UNO R4 -->
+          <!-- --------------------------------------------------------------- -->
+          <div onclick="selectComponent('sender')" id="card_sender" 
+               class="component-card cursor-pointer bg-slate-950/80 border-2 border-blue-500/40 rounded-xl p-4 relative group">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">Arduino UNO R4 (Sender)</h3>
+                  <span class="text-[11px] text-blue-400 font-mono">Datenerfassungs-Knoten</span>
+                </div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono">RA4M1 ARM</span>
+            </div>
+
+            <!-- Interne Kernfunktionen -->
+            <div class="mb-3 p-2 bg-blue-950/30 rounded-lg border border-blue-900/40 text-[11px] text-slate-300 space-y-1">
+              <div>• 10-Bit ADC Abtastung (A0 alle 50 ms / 20 Hz)</div>
+              <div>• Gleitender Mittelwert Ringpuffer (N = 10)</div>
+              <div>• Zyklischer Bus-Transmitter (&ge; 10 Hz)</div>
+            </div>
+
+            <!-- Anschlüsse / Pins -->
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-amber-400 font-semibold">Pin A0 (Analog IN)</span>
+                <span class="text-slate-400">Poti Schleifer (0..5V)</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-emerald-500/30 bg-emerald-950/20">
+                <span class="text-emerald-400 font-bold">Pin 1 (TX Serial1)</span>
+                <span class="text-emerald-300 font-bold">→ Bus zu Empfänger RX</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-rose-400">Pin GND (Masse)</span>
+                <span class="text-rose-300 font-bold">⚡ Zwingend an Empfänger GND</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- KOMPONENTE 4: EMPFÄNGER ARDUINO UNO R4 -->
+          <!-- --------------------------------------------------------------- -->
+          <div onclick="selectComponent('receiver')" id="card_receiver" 
+               class="component-card cursor-pointer bg-slate-950/80 border-2 border-purple-500/40 rounded-xl p-4 relative group">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">Arduino UNO R4 (Empfänger)</h3>
+                  <span class="text-[11px] text-purple-400 font-mono">Auswertungs- & HMI-Knoten</span>
+                </div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono">RA4M1 ARM</span>
+            </div>
+
+            <!-- Interne Kernfunktionen -->
+            <div class="mb-3 p-2 bg-purple-950/30 rounded-lg border border-purple-900/40 text-[11px] text-slate-300 space-y-1">
+              <div>• UART Frame-Parser & Watchdog (> 2.0 s Timeout)</div>
+              <div>• Plausibilitätsüberwachung (&ge; 70% Sprungalarm)</div>
+              <div>• Hold-Speicher & I2C-Displaytreiber</div>
+            </div>
+
+            <!-- Anschlüsse / Pins -->
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-emerald-500/30 bg-emerald-950/20">
+                <span class="text-emerald-400 font-bold">Pin 0 (RX Serial1)</span>
+                <span class="text-emerald-300 font-bold">← Bus von Sender TX</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-cyan-400 font-semibold">Pin 4 (Digital IN)</span>
+                <span class="text-slate-400">Hold-Taster (Active LOW)</span>
+              </div>
+              <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded border border-slate-800">
+                <span class="text-blue-400">Pin A4 / A5</span>
+                <span class="text-slate-400">I2C (SDA / SCL zum LCD)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ----------------------------------------------------------------- -->
+        <!-- KOMPONENTE 5: HOLD-BEDIENTASTER (UNTERER BEREICH) -->
+        <!-- ----------------------------------------------------------------- -->
+        <div onclick="selectComponent('button')" id="card_button"
+             class="component-card cursor-pointer mt-6 bg-slate-950/80 border-2 border-slate-800 rounded-xl p-4 relative group">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">Hold-Bedientaster (Hardware-Trigger)</h3>
+                <p class="text-xs text-slate-400">Schließt Pin D4 auf Masse. Interner Pull-Up aktiv (`INPUT_PULLUP`). Entprellzeit &ge; 50 ms.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-xs">
+              <span class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-cyan-300">Kontakt 1: Pin D4</span>
+              <span class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-rose-300">Kontakt 2: GND</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visuelle Busverbindungs-Leiste (Mitte) -->
+        <div class="mt-6 p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 text-xs font-mono">
+          <div class="flex items-center gap-2 text-emerald-400 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            UART Inter-Arduino Bus: 5V TTL (9600 Baud)
+          </div>
+          <div class="flex items-center gap-2 text-amber-300 bg-slate-900 px-3 py-1 rounded border border-slate-800">
+            Telegramm: <code>&lt;VAL:xxxx;RAW:xxxx&gt;\n</code> (10 Hz Zyklus)
+          </div>
+          <div class="text-rose-400 font-bold flex items-center gap-1.5">
+            <span>⚡ Zwingende GND-Kopplung</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RECHTE SPALTE (4 Cols): Interaktives Detail-Panel & Gesprächsleitfaden -->
+    <div class="lg:col-span-4 flex flex-col gap-6">
+
+      <!-- Detail-Karten-Inspector -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl" id="detailInspector">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Komponenten-Inspektor</span>
+          <span class="text-[11px] font-mono text-slate-500" id="detailIdBadge">SELEKTIERT</span>
+        </div>
+
+        <div class="mt-4" id="detailContent">
+          <!-- Dynamischer Inhalt per JavaScript -->
+        </div>
+      </div>
+
+      <!-- Gesprächs-Checkliste für das Projekt-Meeting -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <h3 class="font-bold text-white text-sm flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            Gesprächs-Checkliste (Kickoff-Meeting)
+          </h3>
+        </div>
+
+        <div class="mt-4 space-y-2.5 text-xs text-slate-300">
+          <label class="flex items-start gap-2.5 p-2 bg-slate-950/60 rounded-lg border border-slate-800/80 cursor-pointer hover:bg-slate-950 transition-colors">
+            <input type="checkbox" checked class="mt-0.5 rounded text-cyan-500 focus:ring-0">
+            <div>
+              <span class="font-bold text-white block">Systemgrenzen & Topologie</span>
+              <span class="text-[11px] text-slate-400">Aufteilung in Datenerfassung (Sender) & Auswertung (HMI) bestätigt.</span>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-2.5 p-2 bg-slate-950/60 rounded-lg border border-slate-800/80 cursor-pointer hover:bg-slate-950 transition-colors">
+            <input type="checkbox" checked class="mt-0.5 rounded text-cyan-500 focus:ring-0">
+            <div>
+              <span class="font-bold text-white block">Hardware-UART (Serial1)</span>
+              <span class="text-[11px] text-slate-400">UNO R4 trennt USB-Debug (`Serial`) und Inter-Arduino-Bus (`Serial1`).</span>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-2.5 p-2 bg-slate-950/60 rounded-lg border border-slate-800/80 cursor-pointer hover:bg-slate-950 transition-colors">
+            <input type="checkbox" checked class="mt-0.5 rounded text-cyan-500 focus:ring-0">
+            <div>
+              <span class="font-bold text-white block">Hold-Trigger & Entprellung</span>
+              <span class="text-[11px] text-slate-400">Anzeige friert bis zum nächsten Druck ein (Hold), Entprellung &ge; 50 ms.</span>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-2.5 p-2 bg-slate-950/60 rounded-lg border border-slate-800/80 cursor-pointer hover:bg-slate-950 transition-colors">
+            <input type="checkbox" checked class="mt-0.5 rounded text-cyan-500 focus:ring-0">
+            <div>
+              <span class="font-bold text-white block">Plausibilität (70% Schwelle)</span>
+              <span class="text-[11px] text-slate-400">Sprungalarm aktiv mit Absicherung für Werte nahe 0V (&Delta; &ge; 50 Digits).</span>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-2.5 p-2 bg-slate-950/60 rounded-lg border border-slate-800/80 cursor-pointer hover:bg-slate-950 transition-colors">
+            <input type="checkbox" checked class="mt-0.5 rounded text-cyan-500 focus:ring-0">
+            <div>
+              <span class="font-bold text-white block">Watchdog-Timeout (> 2.0 s)</span>
+              <span class="text-[11px] text-slate-400">Blinkende Fehlermeldung auf LCD bei Signalverlust, Auto-Recovery bei Rückkehr.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- JavaScript Logik & Detail-Renderer -->
+  <script>
+    const componentDetails = {
+      sender: {
+        title: "Arduino UNO R4 Minima (Sender)",
+        badge: "Teilsystem 1 (Datenerfassung)",
+        desc: "Dient als autarker Datenerfassungs-Knoten. Liest über seinen 10-Bit ADC kontinuierlich das analoge Sensorsignal ein, filtert Rauschen über einen arithmetischen FIFO-Ringpuffer (N = 10) und sendet das Ergebnis zyklisch über den Hardware-Bus.",
+        specs: [
+          { label: "Mikrocontroller", val: "Renesas RA4M1 (ARM Cortex-M4, 48 MHz)" },
+          { label: "Logikpegel / Spannung", val: "+5.0 V DC (Standard 5V)" },
+          { label: "ADC-Auflösung", val: "10-Bit (0 .. 1023 Digits = 0 .. 5.0 V)" },
+          { label: "Abtastintervall", val: "Δt = 50 ms (20 Hz Abtastrate)" },
+          { label: "Filtertiefe", val: "Gleitender Mittelwert N = 10 Samples" },
+          { label: "Bus-Schnittstelle", val: "Hardware UART Serial1 (Pin 1 TX, 9600 Baud)" },
+          { label: "Lastenheft-Zuordnung", val: "A-01, A-02, A-03, A-04, A-10, A-14" }
+        ],
+        talkingPoints: [
+          "Warum Serial1? UNO R4 erlaubt gleichzeitiges USB-Logging ohne Konflikt.",
+          "Ringpuffer-Vorbefüllung in setup() verhindert Fehlmessung bei Kaltstart.",
+          "Modular ausgelegt für bis zu 6 Eingangskanäle (A0–A5)."
+        ]
+      },
+      receiver: {
+        title: "Arduino UNO R4 Minima (Empfänger)",
+        badge: "Teilsystem 2 (Auswertung & HMI)",
+        desc: "Dient als Auswertungs- und Bedienknoten. Empfängt die seriellen Telegramme, überwacht die Verbindungsstabilität (Watchdog), verarbeitet den Hold-Taster und steuert das 4-zeilige I2C-Display an.",
+        specs: [
+          { label: "Mikrocontroller", val: "Renesas RA4M1 (ARM Cortex-M4, 48 MHz)" },
+          { label: "Bus-Empfang", val: "Hardware UART Serial1 (Pin 0 RX, 9600 Baud)" },
+          { label: "Verbindungsüberwachung", val: "Software-Watchdog (Timeout > 2.0 s)" },
+          { label: "Bedienung", val: "Hold-Taster an Pin D4 (INPUT_PULLUP)" },
+          { label: "Plausibilitätslogik", val: "Alarm bei |Δ| ≥ 70% zum Vorgängerwert" },
+          { label: "Display-Schnittstelle", val: "I2C (Pin A4 SDA / Pin A5 SCL, 100 kHz)" },
+          { label: "Lastenheft-Zuordnung", val: "A-04, A-05, A-06, A-07, A-08, A-09, A-11, A-12, A-13" }
+        ],
+        talkingPoints: [
+          "Hold-Funktion: Display friert Messwert bis zum nächsten Druck ein.",
+          "Fail-Safe: Zeigt bei Leitungsbruch 'MOD: ERR! TIMEOUT' an.",
+          "Auto-Recovery: Setzt sich bei Signalwiederkehr selbstständig zurück."
+        ]
+      },
+      poti: {
+        title: "Lineares Präzisions-Potentiometer",
+        badge: "Sensorik / Signalgeber",
+        desc: "Dient als stufenloser analoger Spannungsteiler zur Simulation von Sensorsignalen (z. B. Temperatur, Druck, Wegstrecke) über den vollen Messbereich von 0 bis 5 Volt.",
+        specs: [
+          { label: "Widerstandswert", val: "10 kΩ (linear)" },
+          { label: "Spannungsbereich", val: "0.00 V bis 5.00 V DC" },
+          { label: "Signalanschluss", val: "Schleifer an Sender-Pin A0" },
+          { label: "Lastenheft-Zuordnung", val: "A-01 (Analogeingangserfassung)" }
+        ],
+        talkingPoints: [
+          "Simuliert reale Prozesssignale im Laboraufbau.",
+          "Erweiterbar um echte Sensoren (z. B. TMP36 Temperaturfühler oder DMS-Brücke)."
+        ]
+      },
+      lcd: {
+        title: "HD44780 LC-Display 20×4 mit I2C Backpack",
+        badge: "HMI / Visualisierung",
+        desc: "Stellt den aktuellen Messwert in vier fest strukturierten Zeilen dar: 10-Bit Binär mit 4er-Nibbles, Dezimalwert mit Filterinfo, prozentuale Abweichung und Systemstatus.",
+        specs: [
+          { label: "Format", val: "20 Zeichen × 4 Zeilen (Monospace)" },
+          { label: "Treiber-Backpack", val: "PCF8574 I2C Expander (Adresse 0x27 / 0x3F)" },
+          { label: "Bus-Verbindung", val: "I2C 2-Draht (Pin A4 SDA, Pin A5 SCL)" },
+          { label: "Lastenheft-Zuordnung", val: "A-06, A-07, A-08, A-09, A-11" }
+        ],
+        talkingPoints: [
+          "Zeile 1 zeigt 10-Bit Binärwert sauber in 4er-Blöcken (Nibble-Trennung).",
+          "Zeile 3 signalisiert optischen Alarm bei Sprüngen ≥ 70%.",
+          "Zeile 4 blinkt bei Verbindungsverlust (Watchdog Timeout)."
+        ]
+      },
+      button: {
+        title: "Hold-Bedientaster (Schließer)",
+        badge: "Bedienelement (HMI)",
+        desc: "Ermöglicht dem Benutzer die gezielte Messwertübernahme. Das Display behält den Wert bis zum nächsten Tastendruck unverändert bei.",
+        specs: [
+          { label: "Schaltungstyp", val: "Active LOW (Schaltet Eingang auf Masse)" },
+          { label: "Arduino-Pin", val: "Empfänger Pin D4 (interner INPUT_PULLUP)" },
+          { label: "Software-Entprellung", val: "t_deb ≥ 50 ms (Prellschutz)" },
+          { label: "Latenzzeit", val: "t_lat ≤ 100 ms vom Druck bis zur Displayanzeige" },
+          { label: "Lastenheft-Zuordnung", val: "A-08, A-09" }
+        ],
+        talkingPoints: [
+          "Kein externer Pull-Up-Widerstand nötig dank internem INPUT_PULLUP.",
+          "Verhindert Display-Flackern bei schnellen Signaländerungen."
+        ]
+      }
+    };
+
+    function selectComponent(key) {
+      // Alle Karten deselektieren
+      document.querySelectorAll('.component-card').forEach(c => c.classList.remove('active-selected'));
+      
+      // Ausgewählte Karte markieren
+      const card = document.getElementById(`card_${key}`);
+      if (card) card.classList.add('active-selected');
+
+      const data = componentDetails[key];
+      if (!data) return;
+
+      document.getElementById('detailIdBadge').innerText = data.badge;
+
+      let specsHtml = data.specs.map(s => `
+        <div class="flex justify-between py-1 border-b border-slate-800/80 text-[11px] font-mono">
+          <span class="text-slate-400">${s.label}:</span>
+          <span class="text-slate-200 font-semibold text-right">${s.val}</span>
+        </div>
+      `).join('');
+
+      let pointsHtml = data.talkingPoints.map(p => `
+        <li class="flex items-start gap-1.5 text-xs text-slate-300">
+          <span class="text-cyan-400 font-bold mt-0.5">▸</span>
+          <span>${p}</span>
+        </li>
+      `).join('');
+
+      document.getElementById('detailContent').innerHTML = `
+        <h3 class="text-base font-bold text-white mb-1">${data.title}</h3>
+        <p class="text-xs text-slate-300 leading-relaxed mb-4">${data.desc}</p>
+
+        <div class="mb-4 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Technische Kenndaten:</span>
+          <div class="space-y-1">${specsHtml}</div>
+        </div>
+
+        <div class="bg-cyan-950/20 p-3 rounded-xl border border-cyan-900/40">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400 block mb-2">Punkte für die Projektdiskussion:</span>
+          <ul class="space-y-1.5">${pointsHtml}</ul>
+        </div>
+      `;
+    }
+
+    function setLayerFilter(layer) {
+      document.querySelectorAll('[id^="btnFilter_"]').forEach(b => {
+        b.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all';
+      });
+      document.getElementById(`btnFilter_${layer}`).className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-500 text-slate-950 shadow transition-all';
+    }
+
+    function toggleSignalAnimation() {
+      const btn = document.getElementById('btnAnimToggle');
+      btn.classList.toggle('bg-emerald-600/40');
+    }
+
+    // Beim Starten Sender vorselektieren
+    window.onload = () => selectComponent('sender');
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Compiled binaries & Arduino build artifacts
+*.hex
+*.elf
+*.bin
+build/
+
+# Temporary and editor files
+.vscode/
+*.tmp
+*~
+.DS_Store
+Thumbs.db
