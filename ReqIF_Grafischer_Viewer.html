@@ -127,12 +127,12 @@
   <!-- JAVASCRIPT REQIF PARSER & RENDERER -->
   <script>
     // Standard-ReqIF XML Daten unseres Teststands
-    let reqifXmlText = `<?xml version="1.0" encoding="UTF-8"?>
-<REQ-IF xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd" xml:lang="de">
+    let reqifXmlText = <?xml version="1.0" encoding="UTF-8"?>
+<REQ-IF xmlns="http://www.omg.org/spec/ReqIF/20110401/reqif.xsd" xmlns:configuration="http://eclipse.org/rmf/pror/to_be_done" xml:lang="de">
   <THE-HEADER>
     <REQ-IF-HEADER IDENTIFIER="header-arduino-teststand-001">
-      <COMMENT>System-Anforderungsspezifikation (VDI 2206 / VDI 2221) fuer Eclipse Capella MBSE</COMMENT>
-      <CREATION-TIME>2026-09-01T09:03:00Z</CREATION-TIME>
+      <COMMENT>System-Anforderungsspezifikation (VDI 2206 / VDI 2221) nach Schulcheckliste</COMMENT>
+      <CREATION-TIME>2026-09-01T09:18:27Z</CREATION-TIME>
       <REQ-IF-TOOL-ID>Eclipse Capella ReqIF Generator</REQ-IF-TOOL-ID>
       <REQ-IF-VERSION>1.0</REQ-IF-VERSION>
       <SOURCE-TOOL-ID>Antigravity Systems Engineering Engine</SOURCE-TOOL-ID>
@@ -141,161 +141,587 @@
   </THE-HEADER>
   <CORE-CONTENT>
     <REQ-IF-CONTENT>
+      <DATATYPES>
+        <DATATYPE-DEFINITION-STRING IDENTIFIER="dt_string" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="String" MAX-LENGTH="2000"/>
+        <DATATYPE-DEFINITION-ENUMERATION IDENTIFIER="dt_art" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Anforderungsart">
+          <SPECIFIED-VALUES>
+            <ENUM-VALUE IDENTIFIER="enum_art_f" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Festforderung"/>
+            <ENUM-VALUE IDENTIFIER="enum_art_w" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Wunschforderung"/>
+          </SPECIFIED-VALUES>
+        </DATATYPE-DEFINITION-ENUMERATION>
+        <DATATYPE-DEFINITION-ENUMERATION IDENTIFIER="dt_prio" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Prioritaet">
+          <SPECIFIED-VALUES>
+            <ENUM-VALUE IDENTIFIER="enum_prio_high" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Hoch"/>
+            <ENUM-VALUE IDENTIFIER="enum_prio_med" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Mittel"/>
+            <ENUM-VALUE IDENTIFIER="enum_prio_low" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Niedrig"/>
+          </SPECIFIED-VALUES>
+        </DATATYPE-DEFINITION-ENUMERATION>
+      </DATATYPES>
+      <SPEC-TYPES>
+        <SPEC-OBJECT-TYPE IDENTIFIER="sot_requirement" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="System-Anforderung">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_id" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Req-ID">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_category" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Kategorie">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_title" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Titel">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_desc" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Spezifikation">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_target" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Zielwert / Akzeptanzkriterium">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_verification" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Verifikationsmethode">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+            <ATTRIBUTE-DEFINITION-ENUMERATION IDENTIFIER="attr_art" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Klassifizierung">
+              <TYPE><DATATYPE-DEFINITION-ENUMERATION-REF>dt_art</DATATYPE-DEFINITION-ENUMERATION-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-ENUMERATION>
+            <ATTRIBUTE-DEFINITION-ENUMERATION IDENTIFIER="attr_prio" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Prioritaet">
+              <TYPE><DATATYPE-DEFINITION-ENUMERATION-REF>dt_prio</DATATYPE-DEFINITION-ENUMERATION-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-ENUMERATION>
+          </SPEC-ATTRIBUTES>
+        </SPEC-OBJECT-TYPE>
+        <SPECIFICATION-TYPE IDENTIFIER="st_lastenheft" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Lastenheft-Dokument">
+          <SPEC-ATTRIBUTES>
+            <ATTRIBUTE-DEFINITION-STRING IDENTIFIER="attr_spec_title" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Dokumententitel">
+              <TYPE><DATATYPE-DEFINITION-STRING-REF>dt_string</DATATYPE-DEFINITION-STRING-REF></TYPE>
+            </ATTRIBUTE-DEFINITION-STRING>
+          </SPEC-ATTRIBUTES>
+        </SPECIFICATION-TYPE>
+      </SPEC-TYPES>
       <SPEC-OBJECTS>
-        <SPEC-OBJECT IDENTIFIER="so_A01" LONG-NAME="A-01">
+        <SPEC-OBJECT IDENTIFIER="so_A01" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-01">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-01"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sensorik &amp; Erfassung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Analoge Eingangserfassung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Erfassung eines kontinuierlichen Analogsignals ueber 10-Bit-ADC (0..1023 Digits = 0..5V) an Analogeingang A0."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Linearitaetsfehler &lt;= +-2 LSB"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kalibrierte DC-Spannungsquelle &amp; Digitalmultimeter (DMM)"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-01">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sensorik &amp; Erfassung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Analoge Eingangserfassung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kontinuierliche Erfassung eines analogen DC-Signals (0..5,00 V) ueber 10-Bit-Quantisierung (0..1023 Digits) an Analogeingang A0.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Linearitaetsfehler &lt;= +-2 LSB">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kalibrierte DC-Spannungsquelle &amp; Digitalmultimeter (DMM)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A02" LONG-NAME="A-02">
+        <SPEC-OBJECT IDENTIFIER="so_A02" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-02">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-02"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Signalverarbeitung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Rauschunterdrueckung &amp; Glaettung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Berechnung des gleitenden arithmetischen Mittelwerts ueber exakt N=10 aufeinanderfolgende Samples."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Abtastintervall dt=50ms +- 2ms (20 Hz Abtastrate)"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Signalvergleich Roh- vs. Filterwert im Serial Plotter"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-02">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Signalverarbeitung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Rauschunterdrueckung &amp; Glaettung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zeitdiskrete Glaettung des Eingangssignals mittels gleitendem arithmetischem Mittelwert ueber genau N=10 aufeinanderfolgende Messpunkte.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Abtastintervall dt=50ms +- 2ms (20 Hz Abtastrate)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Signalvergleich Roh- vs. Filterwert im Serial Plotter">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A03" LONG-NAME="A-03">
+        <SPEC-OBJECT IDENTIFIER="so_A03" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-03">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-03"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemskalierung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Erweiterbarkeit der Eingangskanaele"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Hard- und Softwarearchitektur ausgelegt fuer modulare Erweiterung auf bis zu 6 Analogkanaele (A0-A5)."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Architektur unterstuetzt A0..A5"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Funktionstest mit bis zu 6 analogen Signalgebern"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-03">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemskalierung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Erweiterbarkeit der Eingangskanaele">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemarchitektur muss fuer die synchrone Erfassung von bis zu 6 analogen Signalgebern modular erweiterbar sein.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Hard- und Softwaredesign unterstuetzt A0..A5">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Funktionstest mit bis zu 6 analogen Signalgebern">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_w</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_med</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A04" LONG-NAME="A-04">
+        <SPEC-OBJECT IDENTIFIER="so_A04" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-04">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-04"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kommunikation"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zyklische Bus-Datenuebertragung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zyklische Uebertragung des gemittelten Werts via UART-Bus (Serial1) mit Framing &lt;VAL:xxxx;RAW:xxxx&gt;."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Uebertragungsrate f_bus &gt;= 10 Hz (Intervall &lt;= 100ms), 9600 Baud 8N1"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logikanalysator / Serial-Monitor-Trace mit Zeitstempeln"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-04">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Kommunikation">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zyklische Bus-Datenuebertragung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Unaufgeforderte, zyklische Uebertragung des berechneten Messwerts und des Rohwerts ueber eine serielle Punkt-zu-Punkt-Busverbindung.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Uebertragungsrate f_bus &gt;= 10 Hz (Intervall &lt;= 100ms), 9600 Baud 8N1, Telegramm &lt;VAL:xxxx;RAW:xxxx&gt;">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logikanalysator / Serial-Monitor-Trace mit Zeitstempeln">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A05" LONG-NAME="A-05">
+        <SPEC-OBJECT IDENTIFIER="so_A05" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-05">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-05"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemrobustheit"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Bus-Timeout &amp; Verbindungsueberwachung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Automatische Erkennung eines Signal- oder Telegrammausfalls mit LCD-Warnmeldung und Auto-Recovery."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Fehlermeldung auf LCD bei Telegrammausfall &gt; 2.0 s"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Unterbrechung der RX/TX-Signalleitung im laufenden Betrieb"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-05">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemrobustheit">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Bus-Timeout &amp; Verbindungsueberwachung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Selbststaendige Erkennung eines Kommunikationsausfalls mit optischer Warnanzeige und automatischem Wiederanlauf bei Signalrueckkehr.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Wechsel in Fehlermodus bei Ausfall &gt; 2.0 s; Wiederanlaufzeit &lt;= 200 ms">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Unterbrechung der RX/TX-Signalleitung im laufenden Betrieb">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A06" LONG-NAME="A-06">
+        <SPEC-OBJECT IDENTIFIER="so_A06" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-06">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-06"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Display"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="LC-Display Ansteuerung via I2C"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Anbindung eines HD44780-kompatiblen LC-Displays (20 Zeichen x 4 Zeilen) ueber I2C-Backpack (PCF8574)."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="I2C-Busfrequenz 100 kHz, Adresse 0x27 / 0x3F"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="I2C-Bus-Scan / Hardwaretest mit Oszilloskop"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-06">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Display">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Messwert-Visualisierung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Strukturierte 4-zeilige Monospace-Textanzeige zur simultanen Darstellung von Binaerwert, Dezimalwert, Abweichung und Systemstatus.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="4 Zeilen a 20 Zeichen, serielle 2-Draht-Ansteuerung (100 kHz Busfrequenz)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="I2C-Bus-Scan / Hardwaretest mit Oszilloskop">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A07" LONG-NAME="A-07">
+        <SPEC-OBJECT IDENTIFIER="so_A07" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-07">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-07"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Format"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Binaere Messwertdarstellung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Formatierte 10-Bit-Binaerausgabe mit fuehrenden Nullen und 4-Bit-Nibble-Strukturierung (BIN: bb bbbb bbbb)."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Formatierung BIN: bb bbbb bbbb auf Zeile 1"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sichtpruefung der LCD-Anzeige ueber gesamten Stellbereich (0..1023)"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-07">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Format">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Binaere Messwertdarstellung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Formatierte 10-Bit-Binaerausgabe mit fuehrenden Nullen und optischer 4-Bit-Nibble-Trennung auf Zeile 1 des Displays.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Formatierung exakt BIN: bb bbbb bbbb ueber vollen Bereich (0..1023)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sichtpruefung der LCD-Anzeige ueber gesamten Stellbereich">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_med</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A08" LONG-NAME="A-08">
+        <SPEC-OBJECT IDENTIFIER="so_A08" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-08">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-08"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Bedienung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Messwert-Aktualisierung (Hold-Trigger)"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Aktualisierung des Anzeigewerts ausschliesslich bei Betaetigung des Tasters (Hold-Funktion)."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Software-Entprellzeit t_deb &gt;= 50 ms"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Prellpruefung / Funktionstest mit Oszilloskop am Tastereingang"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-08">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="HMI / Bedienung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Messwert-Uebernahme (Hold-Funktion)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Aktualisierung der Displayanzeige ausschliesslich bei gezielter Betaetigung des Bedientasters; dauerhaftes Halten des Anzeigewerts bis zum Folgeimpuls.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sichere Unterdrueckung von Kontaktprellen mit Entprellzeit t_deb &gt;= 50 ms">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Prellpruefung / Funktionstest mit Oszilloskop am Tastereingang">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A09" LONG-NAME="A-09">
+        <SPEC-OBJECT IDENTIFIER="so_A09" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-09">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-09"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemdynamik"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Reaktionszeit HMI-Aktualisierung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Latenzzeit zwischen Tasterbetaetigung (fallende Flanke) und vollstaendiger LCD-Aktualisierung."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Latenz t_lat &lt;= 100 ms"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="2-Kanal-Oszilloskop (Trigger Flanke Taster -&gt; I2C Paket)"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-09">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemdynamik">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Reaktionszeit HMI-Aktualisierung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zeitverzoegerung zwischen Tasterbetaetigung (fallende Flanke) und vollstaendiger Aktualisierung des Displayinhalts.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Gesamtlatenzzeit t_lat &lt;= 100 ms">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="2-Kanal-Oszilloskop (Trigger Flanke Taster -&gt; I2C Paket)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_med</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A10" LONG-NAME="A-10">
+        <SPEC-OBJECT IDENTIFIER="so_A10" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-10">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-10"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemstart"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Definiertes Initialisierungsverhalten"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Nach Kaltstart (Power-On): Boot-Screen (2s), Ringpuffer-Vorbefuellung, definierter Wartezustand."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Boot-Screen 2s, MOD: WAIT TASTE"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Einschaltpruefung / Kaltstart-Zyklus mit Netztrennung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-10">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Systemstart">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Definiertes Initialisierungsverhalten">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Deterministischer Kaltstart-Ablauf mit Begruessungsanzeige, Filter-Vorbefuellung und Einnahme eines sicheren Wartezustands.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Boot-Screen 2.0 s +- 0.1 s, Vorbefuellung N=10, Status: MOD: WAIT TASTE">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Einschaltpruefung / Kaltstart-Zyklus mit Netztrennung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_med</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A11" LONG-NAME="A-11">
+        <SPEC-OBJECT IDENTIFIER="so_A11" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-11">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-11"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logik &amp; Alarm"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Plausibilitaets- &amp; Grenzwertueberwachung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Optischer Alarm auf dem LCD bei relativem Sprung &gt;= 70% mit Nullpunktsschutz (|Delta| &gt;= 50 Digits)."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm bei |Wert_k - Wert_k-1| &gt;= 0.70 * Wert_k-1"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sprungantwort-Test mit Signalgenerator / Poti-Sprung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-11">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logik &amp; Alarm">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Plausibilitaets- &amp; Grenzwertueberwachung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Erkennung und optische Signalisierung unplausibler Signalspruenge (&gt;= 70%) im Vergleich zum vorhergehenden Messwert.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Optischer Alarm DEV: +xx.x% [ALARM] bei |Delta_rel| &gt;= 70.0%; Nullpunktschwelle |Delta| &gt;= 50 Digits bei Referenzwert &lt; 10 Digits">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sprungantwort-Test mit Spannungssprung am Poti">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A12" LONG-NAME="A-12">
+        <SPEC-OBJECT IDENTIFIER="so_A12" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-12">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-12"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logik &amp; Alarm"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm-Ruecksetzung / Quittierung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Der optische Alarmzustand bleibt aktiv, bis ein neuer Messwert innerhalb der Toleranz uebernommen wird."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm-Ruecksetzung bei gueltigem neuem Tastendruck"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Stufentest mit Rueckkehr in den Nennbereich"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-12">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Logik &amp; Alarm">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Alarm-Ruecksetzung &amp; Quittierung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Der optische Alarmzustand bleibt solange aktiv, bis ein neuer Messwert innerhalb des zulaessigen Toleranzbereichs (&lt; 70%) per Taster bestaetigt wird.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Ruecksetzung des Alarmstatus auf [OK] bei nachfolgendem Messwert im Nennbereich">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Stufentest mit Rueckkehr in den Toleranzbereich">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A13" LONG-NAME="A-13">
+        <SPEC-OBJECT IDENTIFIER="so_A13" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-13">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-13"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Datenspeicher"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Direkter Datenzugriff im Speicher"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Strukturierte Vorhaltung von aktuellem Messwert, Vorgaengerwert, Puffer und Flags im SRAM."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Vorhaltung im fluechtigen SRAM"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Code-Review &amp; RAM-Belegungsanalyse via Compiler"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-13">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Datenspeicher">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Messwert- &amp; Referenzwertpufferung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Unterbrechungsfreie Vorhaltung von aktuellem Messwert, vorhergehendem Referenzwert und Filterhistorie zur Laufzeit.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Verzoegerungsfreie Bereitstellung aller Operanden im Arbeitsspeicher fuer die Plausibilitaetsberechnung">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Code-Review &amp; Verifikation des deterministischen Speicherverhaltens">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A14" LONG-NAME="A-14">
+        <SPEC-OBJECT IDENTIFIER="so_A14" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-14">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-14"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Elektrik &amp; Schutz"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsspannung &amp; Schutzbeschaltung"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Versorgungsspannung +5.0V DC +- 5%, zwingendes gemeinsames Bezugspotenzial (GND) und Pull-Ups."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="+5.0V DC +- 5%, GND-Kopplung zwingend"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="DMM-Spannungsmessung &amp; Verifikationspruefung"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-14">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Elektrik &amp; Schutz">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsspannung &amp; Signalintegritaet">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sichere Funktion bei Nennspannung +5.0V DC mit Schutz gegen offene/schwebende Eingangspotenziale.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Spannungsbereich +5.0V +- 5%, definierte High-Pegel an allen Schalteingaengen im Ruhezustand">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="DMM-Spannungsmessung &amp; Verifikationspruefung offener Pins">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_high</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
-        <SPEC-OBJECT IDENTIFIER="so_A15" LONG-NAME="A-15">
+        <SPEC-OBJECT IDENTIFIER="so_A15" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="A-15">
+          <TYPE><SPEC-OBJECT-TYPE-REF>sot_requirement</SPEC-OBJECT-TYPE-REF></TYPE>
           <VALUES>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-15"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Umgebungsbed."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsumgebung &amp; Laborbetrieb"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsbereich: +10 C bis +40 C, relative Luftfeuchtigkeit 20%..80% (nicht kondensierend), IP20."/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Laborbetriebsbereich 10..40 C, IP20"/>
-            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sicht- und Funktionspruefung unter Laborbedingungen"/>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="A-15">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_id</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Umgebungsbed.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_category</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Betriebsumgebung &amp; Laborbetrieb">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Zuerlaessiger Betrieb unter Standard-Labor- und Schulungsbedingungen.">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_desc</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Umgebungstemperatur +10 C .. +40 C, relative Feuchte 20% .. 80% (nicht kondensierend), IP20">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_target</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Sicht- und Funktionspruefung unter Laborbedingungen">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_verification</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_art_f</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_art</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
+            <ATTRIBUTE-VALUE-ENUMERATION>
+              <VALUES><ENUM-VALUE-REF>enum_prio_low</ENUM-VALUE-REF></VALUES>
+              <DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>attr_prio</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-ENUMERATION>
           </VALUES>
         </SPEC-OBJECT>
       </SPEC-OBJECTS>
+      <SPECIFICATIONS>
+        <SPECIFICATION IDENTIFIER="spec_arduino_teststand" LAST-CHANGE="2026-09-01T09:18:27Z" LONG-NAME="Systemanforderungen Arduino Teststand">
+          <TYPE><SPECIFICATION-TYPE-REF>st_lastenheft</SPECIFICATION-TYPE-REF></TYPE>
+          <VALUES>
+            <ATTRIBUTE-VALUE-STRING THE-VALUE="Mikrocontroller-Teststand zur analogen Messwerterfassung (VDI 2206)">
+              <DEFINITION><ATTRIBUTE-DEFINITION-STRING-REF>attr_spec_title</ATTRIBUTE-DEFINITION-STRING-REF></DEFINITION>
+            </ATTRIBUTE-VALUE-STRING>
+          </VALUES>
+          <CHILDREN>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A01" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A01</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A02" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A02</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A03" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A03</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A04" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A04</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A05" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A05</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A06" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A06</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A07" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A07</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A08" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A08</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A09" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A09</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A10" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A10</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A11" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A11</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A12" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A12</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A13" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A13</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A14" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A14</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+            <SPEC-HIERARCHY IDENTIFIER="sh_A15" LAST-CHANGE="2026-09-01T09:18:27Z">
+              <OBJECT><SPEC-OBJECT-REF>so_A15</SPEC-OBJECT-REF></OBJECT>
+            </SPEC-HIERARCHY>
+          </CHILDREN>
+        </SPECIFICATION>
+      </SPECIFICATIONS>
     </REQ-IF-CONTENT>
   </CORE-CONTENT>
-</REQ-IF>`;
+</REQ-IF>
+;
 
     let parsedData = [];
 
