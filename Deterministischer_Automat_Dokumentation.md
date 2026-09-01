@@ -88,11 +88,14 @@ $$y[n] = \frac{1}{N} \sum_{i=0}^{N-1} x[n-i] = \frac{1}{10} \sum_{i=0}^{9} x[n-i
 ### 2.3 Mathematische Plausibilitäts- und Sprungprüffunktion $\Phi$
 Die Entscheidungsfunktion $\Phi: \mathbb{N}_0 \times \mathbb{N}_0 \rightarrow \{\text{FALSE}, \text{TRUE}\}$ überwacht relative Sprünge mit Nullpunktsschutz:
 
-$$\Phi(Wert_k, Wert_{k-1}) = \begin{cases} 
-\text{TRUE}, & \text{wenn } Wert_{k-1} \ge 10 \;\land\; \frac{|Wert_k - Wert_{k-1}|}{Wert_{k-1}} \ge 0{,}70 \\
-\text{TRUE}, & \text{wenn } Wert_{k-1} < 10 \;\land\; |Wert_k - Wert_{k-1}| \ge 50\,\text{Digits} \\
-\text{FALSE}, & \text{sonst (Toleranzbereich OK)}
-\end{cases}$$
+* **Fall A: Standard-Berechnung (für Referenzwerte $Wert_{k-1} \ge 10\,\text{Digits}$):**
+  $$\Delta_{\text{rel}} = \frac{|Wert_k - Wert_{k-1}|}{Wert_{k-1}} \cdot 100\,\% \ge 70{,}0\,\% \implies \Phi(Wert_k, Wert_{k-1}) = \text{TRUE}$$
+
+* **Fall B: Nullpunktsschutz (für Referenzwerte $Wert_{k-1} < 10\,\text{Digits}$):**
+  $$\Delta_{\text{abs}} = |Wert_k - Wert_{k-1}| \ge 50\,\text{Digits} \implies \Phi(Wert_k, Wert_{k-1}) = \text{TRUE}$$
+
+* **Fall C: Normalbetrieb (im Toleranzbereich):**
+  $$\text{In allen anderen Fällen} \implies \Phi(Wert_k, Wert_{k-1}) = \text{FALSE}$$
 
 ---
 
@@ -108,17 +111,18 @@ $$b_i = \left\lfloor \frac{D}{2^i} \right\rfloor \bmod 2 \quad \forall \; i \in 
 
 ## 3. Zustandsüberführungsfunktion $\delta$ & Ausgabefunktion $\lambda$
 
-### 3.1 Formale abschnittsweise Definition der Überführungsfunktion $\delta(q, \sigma)$
+### 3.1 Formale Definition der Überführungsfunktion $\delta(q, \sigma)$
 
-$$\delta(q, \sigma) = \begin{cases}
-S_1, & (q=S_0 \land \sigma=\sigma_{\text{boot}}) \\
-S_2, & (q=S_1 \land \sigma=\sigma_{\text{frame}}) \;\lor\; (q=S_4 \land \text{Refresh Done}) \;\lor\; (q=S_6 \land \sigma=\sigma_{\text{rec}}) \\
-S_3, & (q=S_2 \land \sigma=\sigma_{\text{btn}}) \;\lor\; (q=S_5 \land \sigma=\sigma_{\text{btn}}) \\
-S_4, & (q=S_3 \land \sigma=\sigma_{\text{ok}}) \\
-S_5, & (q=S_3 \land \sigma=\sigma_{\text{alarm}}) \\
-S_6, & (q \in \{S_1, S_2, S_5\} \land \sigma=\sigma_{\text{timeout}}) \\
-q, & \text{sonst (deterministisches Verharren)}
-\end{cases}$$
+Die deterministische Zustandsüberführung ist für alle Zustands-Event-Paare eindeutig definiert:
+
+* $(q = S_0) \land (\sigma = \sigma_{\text{boot}}) \implies \delta(q, \sigma) = S_1$
+* $(q = S_1) \land (\sigma = \sigma_{\text{frame}}) \implies \delta(q, \sigma) = S_2$
+* $(q \in \{S_2, S_5\}) \land (\sigma = \sigma_{\text{btn}}) \implies \delta(q, \sigma) = S_3$
+* $(q = S_3) \land (\sigma = \sigma_{\text{ok}}) \implies \delta(q, \sigma) = S_4$
+* $(q = S_3) \land (\sigma = \sigma_{\text{alarm}}) \implies \delta(q, \sigma) = S_5$
+* $(q = S_4) \land (\text{Refresh Done}) \implies \delta(q, \sigma) = S_2$
+* $(q \in \{S_1, S_2, S_5\}) \land (\sigma = \sigma_{\text{timeout}}) \implies \delta(q, \sigma) = S_6$
+* $(q = S_6) \land (\sigma = \sigma_{\text{rec}}) \implies \delta(q, \sigma) = S_2$
 
 ---
 
