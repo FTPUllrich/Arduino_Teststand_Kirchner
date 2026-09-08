@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2× Arduino UNO R4 Teststand – Zentraler Projekt-Hub</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-[#0b1120] text-slate-100 min-h-screen p-4 md:p-8 antialiased">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- HERO / HEADER -->
+    <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-mono font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              STATUS: INITIALISIERT & FREIGABEREIF (V1.2)
+            </span>
+            <span class="text-xs text-slate-400 font-mono">DIN 69901 / VDI 2206</span>
+          </div>
+          <h1 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight">2× Arduino UNO R4 Teststand Hub</h1>
+          <p class="text-sm md:text-base text-slate-300 mt-1 max-w-2xl">
+            Zentrale Projektsteuerungs-Zentrale für den Mikrocontroller-Teststand zur analogen Datenerfassung, UART-Busübertragung & LCD-Plausibilitätsanzeige.
+          </p>
+          <div class="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400 mt-3">
+            <span>Schule: Werner-von-Siemens-Schule Hildesheim</span>
+            <span>•</span>
+            <span>Fachrichtung: Elektrotechnik (WFSE-25)</span>
+            <span>•</span>
+            <span>Prüfer: Herr Kirchner</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MEILENSTEIN-STATUSBAR -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Projektfortschritt (VDI 2206 Entwicklungszyklus)</span>
+        <span class="text-xs font-mono text-emerald-400 font-bold">Phase 1 Abgeschlossen (40% Gesamtfortschritt)</span>
+      </div>
+      <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800">
+        <div class="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 40%;"></div>
+      </div>
+      <div class="grid grid-cols-3 text-[11px] font-mono mt-2 text-slate-400">
+        <div class="text-left text-emerald-400 font-semibold">✓ 1. Systemebene & Lastenheft</div>
+        <div class="text-center text-cyan-300 font-semibold">► 2. Hardwareaufbau & Flashen</div>
+        <div class="text-right text-slate-500">3. Integration & Systemtest</div>
+      </div>
+    </div>
+
+    <!-- SCHNELLSTART-RASTER: DIE 4 INTERAKTIVEN TOOLS -->
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+        Interaktive Web-Tools & Simulatoren (Im Browser öffnen)
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Tool 1: Simulator -->
+        <a href="Teststand_Sandbox_Simulation.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-5 transition-all group shadow-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-emerald-400 font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">LIVE-SIMULATION</span>
+            <span class="text-xs text-slate-500 group-hover:text-emerald-400 transition-colors font-mono">Öffnen ↗</span>
+          </div>
+          <h3 class="font-bold text-white text-base group-hover:text-emerald-300 transition-colors">Teststand Sandbox-Simulation</h3>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+            Virtueller 2× UNO R4 Teststand mit Live-Oszilloskop, Ringpuffer-Visualisierung, Potentiometer, Watchdog-Timer & 20×4 LCD Display.
+          </p>
+        </a>
+
+        <!-- Tool 2: Physische Topologie -->
+        <a href="Physische_Komponenten_Sandbox.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-5 transition-all group shadow-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-cyan-400 font-bold px-2.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">HARDWARE-TOPOLOGIE</span>
+            <span class="text-xs text-slate-500 group-hover:text-cyan-400 transition-colors font-mono">Öffnen ↗</span>
+          </div>
+          <h3 class="font-bold text-white text-base group-hover:text-cyan-300 transition-colors">Physisches Komponenten-Board</h3>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+            Schaltplan-Board mit Verdrahtungsübersicht, Pinbelegung (A0, Serial1, D4, I2C), technischen Kenndaten und Gesprächs-Checkliste.
+          </p>
+        </a>
+
+        <!-- Tool 3: ReqIF Viewer -->
+        <a href="ReqIF_Grafischer_Viewer.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-5 transition-all group shadow-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-indigo-400 font-bold px-2.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">OMG REQIF 1.0</span>
+            <span class="text-xs text-slate-500 group-hover:text-indigo-400 transition-colors font-mono">Öffnen ↗</span>
+          </div>
+          <h3 class="font-bold text-white text-base group-hover:text-indigo-300 transition-colors">ReqIF Anforderungs-Viewer</h3>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+            Visueller Requirements-Reader und Baumstruktur für MBSE-Modelle (Eclipse Capella, Siemens Polarion, IBM DOORS).
+          </p>
+        </a>
+
+        <!-- Tool 4: Management Portal -->
+        <a href="Requirements_Management_Portal.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 transition-all group shadow-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-amber-400 font-bold px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">MANAGEMENT-PORTAL</span>
+            <span class="text-xs text-slate-500 group-hover:text-amber-400 transition-colors font-mono">Öffnen ↗</span>
+          </div>
+          <h3 class="font-bold text-white text-base group-hover:text-amber-300 transition-colors">Requirements Audit Portal</h3>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+            Übersichtliche Kriterien-Matrix zur Gegenüberstellung aller 15 Anforderungen mit den 11 Kriterien von Herrn Kirchner.
+          </p>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- DOKUMENTE & REFERENZEN -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Spalte 1: Verbindliche Projekt-Dokumente -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <h3 class="font-bold text-white text-sm pb-3 border-b border-slate-800 mb-3 flex items-center gap-2">
+          <span class="text-cyan-400 font-mono">01</span>
+          Verbindliche Dokumente & Lastenheft
+        </h3>
+        <ul class="space-y-2.5 text-xs">
+          <li>
+            <a href="PROJEKTINITIALISIERUNG_TESTSTAND.md" class="text-cyan-400 hover:underline font-semibold block">📄 PROJEKTINITIALISIERUNG_TESTSTAND.md</a>
+            <span class="text-slate-400 text-[11px]">Formeller Projektauftrag (PID), SMART-Ziele, Scope & BOM.</span>
+          </li>
+          <li>
+            <a href="GESPRAECHSGRUNDLAGE_LEHRERTERMIN.md" class="text-cyan-400 hover:underline font-semibold block">🤝 GESPRAECHSGRUNDLAGE_LEHRERTERMIN.md</a>
+            <span class="text-slate-400 text-[11px]">Leitfaden für das nächste Meeting mit Herrn Kirchner & Fragenkatalog.</span>
+          </li>
+          <li>
+            <a href="Anforderungsspezifikation_Arduino_Teststand.md" class="text-cyan-400 hover:underline font-semibold block">📋 Anforderungsspezifikation_Arduino_Teststand.md</a>
+            <span class="text-slate-400 text-[11px]">Das vollständige Lastenheft (A-01 bis A-15) mit mathematischen Definitionen.</span>
+          </li>
+          <li>
+            <a href="V-MODELL_ARDUINO_TESTSTAND.md" class="text-cyan-400 hover:underline font-semibold block">📐 V-MODELL_ARDUINO_TESTSTAND.md</a>
+            <span class="text-slate-400 text-[11px]">Methodik VDI 2206 und Traceability-Matrix zu den Testfällen TC-01..07.</span>
+          </li>
+          <li>
+            <a href="Anforderungsprotokoll_Arduino_Teststand_v1.2.xlsx" class="text-emerald-400 hover:underline font-semibold block">📊 Anforderungsprotokoll_Arduino_Teststand_v1.2.xlsx</a>
+            <span class="text-slate-400 text-[11px]">Aktuelle Excel-Matrix V1.2 mit 3 Reitern (Lastenheft, Offene Punkte, LCD).</span>
+          </li>
+          <li>
+            <a href="Liste_Termine_Themen_WFSE_25.xls" class="text-emerald-400 hover:underline font-semibold block">📅 Liste_Termine_Themen_WFSE_25.xls</a>
+            <span class="text-slate-400 text-[11px]">Schul-Terminliste (Janis Ole Stach: 26.11.2026).</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Spalte 2: Quellcode & Firmware -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <h3 class="font-bold text-white text-sm pb-3 border-b border-slate-800 mb-3 flex items-center gap-2">
+          <span class="text-emerald-400 font-mono">02</span>
+          C++ Firmware & Konfiguration
+        </h3>
+        <ul class="space-y-2.5 text-xs">
+          <li>
+            <a href="TeststandConfig.h" class="text-amber-300 hover:underline font-semibold block font-mono">⚙ TeststandConfig.h</a>
+            <span class="text-slate-400 text-[11px]">Zentraler Parameter-Header (Schwellenwerte, Pin-Definitionen, Baudraten).</span>
+          </li>
+          <li>
+            <a href="Sender.ino" class="text-blue-400 hover:underline font-semibold block font-mono">⚡ Sender.ino</a>
+            <span class="text-slate-400 text-[11px]">Datenerfassung an Pin A0, Ringpuffer (N=10), Hardware-UART Serial1.</span>
+          </li>
+          <li>
+            <a href="Empfaenger.ino" class="text-purple-400 hover:underline font-semibold block font-mono">📟 Empfaenger.ino</a>
+            <span class="text-slate-400 text-[11px]">Hold-Logik (D4), autarker 2s-Watchdog, 70%-Sprungalarm, 20x4 LCD via I2C.</span>
+          </li>
+          <li>
+            <a href="Aufbauanleitung_und_Schaltplan.md" class="text-slate-300 hover:underline font-semibold block">🔌 Aufbauanleitung_und_Schaltplan.md</a>
+            <span class="text-slate-400 text-[11px]">Schritt-für-Schritt-Verdrahtung auf dem Breadboard.</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-slate-500 py-4 font-mono">
+      2× Arduino UNO R4 Teststand Projekt • Werner-von-Siemens-Schule Hildesheim • Fachschule Technik
+    </footer>
+
+  </div>
+
+</body>
+</html>

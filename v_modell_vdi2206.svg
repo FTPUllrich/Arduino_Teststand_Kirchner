@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%" style="background:#f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Pfeilspitzen -->
+    <marker id="arrow-down" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284c7" />
+    </marker>
+    <marker id="arrow-up" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0d9488" />
+    </marker>
+    <marker id="arrow-verify" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+
+    <!-- Schatteneffekt -->
+    <filter id="shadow" x="-5%" y="-10%" width="110%" height="130%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <!-- Titel & Header -->
+  <text x="600" y="45" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">V-Modell nach VDI 2206: Mikrocontroller-Teststand</text>
+  <text x="600" y="72" text-anchor="middle" font-size="14" fill="#64748b">Duale Arduino Uno R3 Architektur mit UART-Bus &amp; 20×4 I2C-Display</text>
+
+  <!-- Hintergrund V-Form Leitlinie -->
+  <path d="M 230 140 L 600 550 L 970 140" fill="none" stroke="#e2e8f0" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Horizontale Verifikationslinien (Gegenüberstellung) -->
+  <!-- Ebene 1: Anforderungen <-> Validierung -->
+  <line x1="390" y1="170" x2="810" y2="170" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,6" />
+  <path d="M 810 170 L 390 170" stroke="transparent" />
+  <rect x="500" y="156" width="200" height="26" rx="13" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="600" y="173" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">◄ Validierung (Soll vs. Ist) ►</text>
+
+  <!-- Ebene 2: Systementwurf <-> Integrationstest -->
+  <line x1="430" y1="290" x2="770" y2="290" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,6" />
+  <rect x="495" y="276" width="210" height="26" rx="13" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="600" y="293" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">◄ Schnittstellen-Verifikation ►</text>
+
+  <!-- Ebene 3: Feinentwurf <-> Komponententest -->
+  <line x1="470" y1="410" x2="730" y2="410" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,6" />
+  <rect x="500" y="396" width="200" height="26" rx="13" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="600" y="413" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">◄ Modul-Verifikation ►</text>
+
+  <!-- Ablauf-Pfeile linker Ast (Abwärts) -->
+  <line x1="230" y1="215" x2="270" y2="245" stroke="#0284c7" stroke-width="3" marker-end="url(#arrow-down)" />
+  <line x1="290" y1="335" x2="330" y2="365" stroke="#0284c7" stroke-width="3" marker-end="url(#arrow-down)" />
+  <line x1="360" y1="455" x2="420" y2="495" stroke="#0284c7" stroke-width="3" marker-end="url(#arrow-down)" />
+
+  <!-- Ablauf-Pfeile rechter Ast (Aufwärts) -->
+  <line x1="780" y1="495" x2="840" y2="455" stroke="#0d9488" stroke-width="3" marker-end="url(#arrow-up)" />
+  <line x1="870" y1="365" x2="910" y2="335" stroke="#0d9488" stroke-width="3" marker-end="url(#arrow-up)" />
+  <line x1="930" y1="245" x2="970" y2="215" stroke="#0d9488" stroke-width="3" marker-end="url(#arrow-up)" />
+
+  <!-- ==================== LINKER AST (ENTWURF) ==================== -->
+
+  <!-- Stufe 1: Anforderungen -->
+  <g transform="translate(60, 125)" filter="url(#shadow)">
+    <rect width="320" height="88" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="2" />
+    <rect width="320" height="6" rx="3" fill="#0284c7" />
+    <text x="16" y="30" font-size="15" font-weight="700" fill="#0369a1">1. Anforderungen (Lastenheft)</text>
+    <text x="16" y="50" font-size="12" fill="#334155">• 10-Bit ADC (0..5V / 0..1023 Digits)</text>
+    <text x="16" y="67" font-size="12" fill="#334155">• Buszyklus ≥ 10 Hz, Timeout &gt; 2s</text>
+    <text x="16" y="84" font-size="12" fill="#334155">• Grenzwert-Alarm bei |Δ| ≥ 70%, Hold-Taste</text>
+  </g>
+
+  <!-- Stufe 2: Systementwurf -->
+  <g transform="translate(130, 245)" filter="url(#shadow)">
+    <rect width="300" height="88" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="2" />
+    <rect width="300" height="6" rx="3" fill="#0284c7" />
+    <text x="16" y="30" font-size="15" font-weight="700" fill="#0369a1">2. Systementwurf</text>
+    <text x="16" y="50" font-size="12" fill="#334155">• Sender: Erfassung &amp; Mittelwertfilter</text>
+    <text x="16" y="67" font-size="12" fill="#334155">• Empfänger: Auswertung &amp; 20×4 LCD</text>
+    <text x="16" y="84" font-size="12" fill="#334155">• UART-Bus (9600 Baud) + gemeinsamer GND</text>
+  </g>
+
+  <!-- Stufe 3: Feinentwurf -->
+  <g transform="translate(190, 365)" filter="url(#shadow)">
+    <rect width="280" height="88" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="2" />
+    <rect width="280" height="6" rx="3" fill="#0284c7" />
+    <text x="16" y="30" font-size="15" font-weight="700" fill="#0369a1">3. Feinentwurf</text>
+    <text x="16" y="50" font-size="12" fill="#334155">• Pinbelegung: A0, D4 (Pull-Up), I2C A4/A5</text>
+    <text x="16" y="67" font-size="12" fill="#334155">• Ringpuffer N=10, 50ms Abtastung</text>
+    <text x="16" y="84" font-size="12" fill="#334155">• Frame-Protokoll: "VAL:&lt;wert&gt;\n"</text>
+  </g>
+
+  <!-- ==================== SPITZE (REALISIERUNG) ==================== -->
+
+  <g transform="translate(425, 500)" filter="url(#shadow)">
+    <rect width="350" height="98" rx="10" fill="#ffffff" stroke="#ea580c" stroke-width="2.5" />
+    <rect width="350" height="7" rx="3" fill="#ea580c" />
+    <text x="175" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#c2410c">4. Realisierung &amp; Aufbau</text>
+    <text x="175" y="54" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">• Schaltungsaufbau auf Labor-Steckbrett</text>
+    <text x="175" y="71" text-anchor="middle" font-size="12" fill="#334155">Programmierung Sender.ino (Filter &amp; UART)</text>
+    <text x="175" y="88" text-anchor="middle" font-size="12" fill="#334155">Programmierung Empfaenger.ino (LCD &amp; Alarm)</text>
+  </g>
+
+  <!-- ==================== RECHTER AST (VERIFIKATION & VALIDIERUNG) ==================== -->
+
+  <!-- Stufe 5: Komponententest -->
+  <g transform="translate(730, 365)" filter="url(#shadow)">
+    <rect width="280" height="88" rx="8" fill="#ffffff" stroke="#0d9488" stroke-width="2" />
+    <rect width="280" height="6" rx="3" fill="#0d9488" />
+    <text x="16" y="30" font-size="15" font-weight="700" fill="#0f766e">5. Komponententest</text>
+    <text x="16" y="50" font-size="12" fill="#334155">• Sensor-ADC prüfen (0..1023 Digits)</text>
+    <text x="16" y="67" font-size="12" fill="#334155">• I2C-Display Scanner &amp; Kontrasttest</text>
+    <text x="16" y="84" font-size="12" fill="#334155">• Tasterentprellung an D4 prüfen</text>
+  </g>
+
+  <!-- Stufe 6: Integrationstest -->
+  <g transform="translate(770, 245)" filter="url(#shadow)">
+    <rect width="300" height="88" rx="8" fill="#ffffff" stroke="#0d9488" stroke-width="2" />
+    <rect width="300" height="6" rx="3" fill="#0d9488" />
+    <text x="16" y="30" font-size="15" font-weight="700" fill="#0f766e">6. Integrationstest</text>
+    <text x="16" y="50" font-size="12" fill="#334155">• UART-Verbindung Sender ↔ Empfänger</text>
+    <text x="16" y="67" font-size="12" fill="#334155">• Timeout-Test (&gt;2s Alarm bei Kabeltrennung)</text>
+    <text x="16" y="84" font-size="12" fill="#334155">• Hold-Taster Trigger auf Displaywert</text>
+  </g>
+
+  <!-- Stufe 7: Systemvalidierung -->
+  <g transform="translate(820, 125)" filter="url(#shadow)">
+    <rect width="320" height="88" rx="8" fill="#ffffff" stroke="#0d9488" stroke-width="2" />
+    <rect width="320" height="6" rx="3" fill="#0d9488" />
+    <text x="16" y="30" font-size="15" font-weight="700" fill="#0f766e">7. Systemvalidierung</text>
+    <text x="16" y="50" font-size="12" fill="#334155">• Gesamtabnahme gegen Lastenheft (A-01..15)</text>
+    <text x="16" y="67" font-size="12" fill="#334155">• Sprungantwort-Test: Alarm bei |Δ| ≥ 70%</text>
+    <text x="16" y="84" font-size="12" fill="#334155">• Latenzmessung: Taster → Anzeige ≤ 100ms</text>
+  </g>
+
+  <!-- Fußzeile / Legende -->
+  <rect x="250" y="625" width="700" height="35" rx="6" fill="#e2e8f0" />
+  <text x="270" y="647" font-size="12" font-weight="600" fill="#0369a1">■ Linker Ast: Dekomposition &amp; Entwurf</text>
+  <text x="515" y="647" font-size="12" font-weight="600" fill="#c2410c">■ Realisierung</text>
+  <text x="645" y="647" font-size="12" font-weight="600" fill="#0f766e">■ Rechter Ast: Integration &amp; Test</text>
+  <text x="890" y="647" font-size="12" fill="#64748b">VDI 2206 / 2221</text>
+</svg>
