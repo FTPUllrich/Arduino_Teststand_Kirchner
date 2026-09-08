@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sender Fließdiagramm & PAP Simulator (DIN 66001)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Fließdiagramm SVG Nodes */
+    .flow-node {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .flow-node:hover {
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+    }
+    .flow-node.active-node {
+      stroke: #38bdf8 !important;
+      stroke-width: 3px !important;
+      filter: drop-shadow(0 0 14px #0284c7) !important;
+    }
+  </style>
+</head>
+<body class="bg-[#0b1120] text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- ======================================================================= -->
+  <!-- HEADER -->
+  <!-- ======================================================================= -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white leading-none">Sender-Fließdiagramm & Code-Visualizer</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono">DIN 66001 / ISO 5807</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Ablaufdiagramm Datenerfassung: 20 Hz Filterung & 10 Hz UART-Busübertragung</p>
+        </div>
+      </div>
+
+      <!-- Aktionen -->
+      <div class="flex flex-wrap items-center gap-2">
+        <a href="Projekt_Start_Hub.html" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all flex items-center gap-1.5">
+          <span>🚀</span> Start-Hub
+        </a>
+        <button onclick="downloadSvg()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white shadow-md transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          SVG Export
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- HAUPTINHALT: 2 SPALTEN (LINKS: FLIESSDIAGRAMM, RECHTS: LIVE-STATUS & CODE) -->
+  <!-- ======================================================================= -->
+  <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LINKE SPALTE (7 Cols): SVG Fließdiagramm -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Programmablaufplan (Sender.ino)</span>
+          <div class="flex items-center gap-2 text-xs">
+            <button onclick="stepSim()" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-lg transition-colors">
+              Einzelschritt ▸
+            </button>
+            <button onclick="toggleAuto()" id="btnAuto" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-lg transition-colors">
+              Auto-Play ▶
+            </button>
+          </div>
+        </div>
+
+        <!-- SVG Container -->
+        <div class="flex-1 overflow-auto custom-scrollbar flex items-center justify-center p-2 min-h-[550px]" id="svgWrapper">
+          <svg id="papSvg" viewBox="0 0 460 760" width="100%" height="720" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+              </marker>
+              <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+              </marker>
+              <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+              </marker>
+            </defs>
+
+            <!-- Verbindungs-Pfade -->
+            <!-- Start -> Setup -->
+            <path d="M 230 45 L 230 75" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+            <!-- Setup -> Prefill -->
+            <path d="M 230 135 L 230 165" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+            <!-- Prefill -> Loop -->
+            <path d="M 230 225 L 230 255" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+            
+            <!-- Loop -> Check Task 1 -->
+            <path d="M 230 300 L 230 330" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+
+            <!-- Check Task 1 -- Ja -->
+            <path d="M 330 365 L 360 365 L 360 410" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-emerald)" fill="none" />
+            <!-- Check Task 1 -- Nein -->
+            <path d="M 130 365 L 100 365 L 100 480 L 230 480" stroke="#64748b" stroke-width="1.5" fill="none" />
+
+            <!-- Task 1 Done -> Task 2 Check -->
+            <path d="M 360 470 L 360 500 L 230 500 L 230 520" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+
+            <!-- Check Task 2 -- Ja -->
+            <path d="M 330 555 L 360 555 L 360 600" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-amber)" fill="none" />
+            <!-- Check Task 2 -- Nein -->
+            <path d="M 130 555 L 100 555 L 100 665 L 230 665" stroke="#64748b" stroke-width="1.5" fill="none" />
+
+            <!-- Task 2 Done -> Loop End -->
+            <path d="M 360 660 L 360 685 L 230 685" stroke="#38bdf8" stroke-width="2" fill="none" />
+            <path d="M 230 685 L 230 705" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+
+            <!-- Loop Back: von Loop End zurück zu Loop Start -->
+            <path d="M 160 725 L 40 725 L 40 277 L 160 277" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow)" fill="none" />
+
+            <!-- ================= KNOTEN-DEFINITIONEN ================= -->
+
+            <!-- 1. START -->
+            <g id="node_start" class="flow-node" onclick="selectNode('start')">
+              <rect x="150" y="10" width="160" height="35" rx="17.5" fill="#0f766e" stroke="#14b8a6" stroke-width="1.5" />
+              <text x="230" y="32" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle" font-family="Inter">START (Power-On)</text>
+            </g>
+
+            <!-- 2. SETUP -->
+            <g id="node_setup" class="flow-node" onclick="selectNode('setup')">
+              <rect x="110" y="75" width="240" height="60" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+              <text x="230" y="98" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle" font-family="JetBrains Mono">setup(): UART Initialisierung</text>
+              <text x="230" y="116" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="Inter">BUS_SERIAL.begin(9600, 8N1)</text>
+              <text x="230" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="Inter">DEBUG_SERIAL.begin(115200)</text>
+            </g>
+
+            <!-- 3. PREFILL -->
+            <g id="node_prefill" class="flow-node" onclick="selectNode('prefill')">
+              <rect x="90" y="165" width="280" height="60" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5" />
+              <text x="230" y="188" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle" font-family="JetBrains Mono">Kaltstart-Vorbefüllung (A-10)</text>
+              <text x="230" y="204" fill="#cbd5e1" font-size="10" text-anchor="middle" font-family="Inter">readings[0..9] = analogRead(A0)</text>
+              <text x="230" y="217" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="Inter">ringTotal = 10 * Raw; Avg = Raw</text>
+            </g>
+
+            <!-- 4. LOOP START -->
+            <g id="node_loop" class="flow-node" onclick="selectNode('loop')">
+              <rect x="160" y="255" width="140" height="45" rx="22.5" fill="#1e1b4b" stroke="#818cf8" stroke-width="2" />
+              <text x="230" y="278" fill="#c7d2fe" font-size="12" font-weight="bold" text-anchor="middle" font-family="Inter">loop() Zyklus</text>
+              <text x="230" y="291" fill="#818cf8" font-size="9" font-family="JetBrains Mono" text-anchor="middle">millis() erfassen</text>
+            </g>
+
+            <!-- 5. CHECK TASK 1 -->
+            <g id="node_check_t1" class="flow-node" onclick="selectNode('check_t1')">
+              <polygon points="230,330 330,365 230,400 130,365" fill="#312e81" stroke="#818cf8" stroke-width="2" />
+              <text x="230" y="362" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" font-family="Inter">Δt_sample ≥ 50 ms?</text>
+              <text x="230" y="375" fill="#a5b4fc" font-size="9" text-anchor="middle" font-family="JetBrains Mono">(20 Hz Filterung)</text>
+              <text x="342" y="358" fill="#10b981" font-size="10" font-weight="bold">Ja</text>
+              <text x="110" y="358" fill="#94a3b8" font-size="10">Nein</text>
+            </g>
+
+            <!-- 6. TASK 1 EXECUTE -->
+            <g id="node_task1" class="flow-node" onclick="selectNode('task1')">
+              <rect x="260" y="410" width="190" height="60" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="2" />
+              <text x="355" y="428" fill="#34d399" font-size="11" font-weight="bold" text-anchor="middle" font-family="JetBrains Mono">Task 1: ADC & FIR-Filter</text>
+              <text x="355" y="443" fill="#ecfdf5" font-size="9" text-anchor="middle" font-family="Inter">latestRaw = analogRead(A0)</text>
+              <text x="355" y="455" fill="#a7f3d0" font-size="9" text-anchor="middle" font-family="Inter">ringTotal += Neu - Alt</text>
+              <text x="355" y="466" fill="#a7f3d0" font-size="9" text-anchor="middle" font-family="Inter">readIndex = (readIndex+1)%10</text>
+            </g>
+
+            <!-- 7. CHECK TASK 2 -->
+            <g id="node_check_t2" class="flow-node" onclick="selectNode('check_t2')">
+              <polygon points="230,520 330,555 230,590 130,555" fill="#451a03" stroke="#f59e0b" stroke-width="2" />
+              <text x="230" y="552" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" font-family="Inter">Δt_tx ≥ 100 ms?</text>
+              <text x="230" y="565" fill="#fde68a" font-size="9" text-anchor="middle" font-family="JetBrains Mono">(10 Hz Bus-TX)</text>
+              <text x="342" y="548" fill="#f59e0b" font-size="10" font-weight="bold">Ja</text>
+              <text x="110" y="548" fill="#94a3b8" font-size="10">Nein</text>
+            </g>
+
+            <!-- 8. TASK 2 EXECUTE -->
+            <g id="node_task2" class="flow-node" onclick="selectNode('task2')">
+              <rect x="260" y="600" width="190" height="60" rx="8" fill="#78350f" stroke="#f59e0b" stroke-width="2" />
+              <text x="355" y="620" fill="#fde047" font-size="11" font-weight="bold" text-anchor="middle" font-family="JetBrains Mono">Task 2: UART-Framing</text>
+              <text x="355" y="635" fill="#fef3c7" font-size="9" text-anchor="middle" font-family="Inter">snprintf(&lt;VAL:xxxx;RAW:xxxx&gt;)</text>
+              <text x="355" y="648" fill="#fef3c7" font-size="9" text-anchor="middle" font-family="Inter">BUS_SERIAL.println(txBuffer)</text>
+            </g>
+
+            <!-- 9. LOOP END -->
+            <g id="node_loop_end" class="flow-node" onclick="selectNode('loop_end')">
+              <rect x="160" y="705" width="140" height="38" rx="19" fill="#1e293b" stroke="#64748b" stroke-width="1.5" />
+              <text x="230" y="728" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle" font-family="Inter">Ende Schleifendurchlauf</text>
+            </g>
+
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECHTE SPALTE (5 Cols): Live-Status, Puffer-Visualisierung & Code-Inspektor -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+
+      <!-- Interaktiver Sensor-Schieberegler -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Analogsensor Signalgeber (Pin A0)</span>
+          <span class="font-mono text-xs text-white" id="sliderValDisplay">512 Digits (2.50 V)</span>
+        </div>
+        <input type="range" id="potSlider" min="0" max="1023" value="512" oninput="updatePot(this.value)" class="w-full accent-cyan-500 cursor-pointer">
+      </div>
+
+      <!-- Ringpuffer-Visualisierung (FIFO N=10) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">FIFO-Ringpuffer (readings[10])</span>
+          <span class="text-[10px] font-mono text-slate-400">Index: <strong id="bufIdx" class="text-cyan-400">0</strong></span>
+        </div>
+        <div class="grid grid-cols-5 gap-1.5 font-mono text-center text-xs" id="bufferGrid">
+          <!-- 10 Pufferzellen dynamisch befüllt -->
+        </div>
+        <div class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400">Summe: <strong id="valTotal" class="text-white">5120</strong></span>
+          <span class="text-slate-400">Mittelwert (Avg): <strong id="valAvg" class="text-emerald-400">512</strong></span>
+        </div>
+      </div>
+
+      <!-- Telegramm-Ausgabe -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-2">Gesendetes UART-Telegramm (Serial1)</span>
+        <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-amber-300 flex items-center justify-between">
+          <span id="txTelegramDisplay">&lt;VAL:0512;RAW:0512&gt;</span>
+          <span class="text-[10px] text-slate-500">9600 Baud</span>
+        </div>
+      </div>
+
+      <!-- Code-Ausschnitt & Erklärung -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
+        <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 block mb-2" id="detailTitle">Erklärung & Code-Ausschnitt</span>
+        <p class="text-xs text-slate-300 leading-relaxed mb-3" id="detailDesc">
+          Klicken Sie auf einen Block im Diagramm oder nutzen Sie „Einzelschritt“, um die Programmausführung Schritt für Schritt zu simulieren.
+        </p>
+        <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-cyan-300 overflow-x-auto custom-scrollbar flex-1" id="detailCode">// C++ Quellcode</pre>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT SIMULATIONSLOGIK -->
+  <script>
+    let potVal = 512;
+    let readings = [512, 512, 512, 512, 512, 512, 512, 512, 512, 512];
+    let readIndex = 0;
+    let ringTotal = 5120;
+    let filteredAverage = 512;
+    let lastSampleTime = 0;
+    let lastTxTime = 0;
+    let simMillis = 0;
+    let autoInterval = null;
+
+    const nodeOrder = ['start', 'setup', 'prefill', 'loop', 'check_t1', 'task1', 'check_t2', 'task2', 'loop_end'];
+    let currentNodeIndex = 3; // Start at loop
+
+    const nodeDetails = {
+      start: {
+        title: "START / Power-On Reset",
+        desc: "Nach Anlegen der Versorgungsspannung (+5V) startet der Renesas RA4M1 Mikrocontroller und springt in die setup()-Routine.",
+        code: "void setup() {\n  // Hardware initialisieren...\n}"
+      },
+      setup: {
+        title: "setup(): UART & Pins initialisieren",
+        desc: "Initialisiert die serielle Hardware-Schnittstelle Serial1 mit 9600 Baud für den Inter-Arduino-Bus und Serial (115200 Baud) für den PC-Plotter.",
+        code: "BUS_SERIAL.begin(UART_BAUDRATE);\n#if defined(ARDUINO_UNOR4_MINIMA)\n  DEBUG_SERIAL.begin(115200);\n#endif"
+      },
+      prefill: {
+        title: "Kaltstart-Vorbefüllung (Einschwingschutz)",
+        desc: "Liest einen ersten Sensorwert ein und füllt sofort alle 10 Pufferplätze. Verhindert Einschwingverzögerungen beim Systemstart (Anforderung A-10).",
+        code: "latestRawValue = analogRead(PIN_ANALOG_IN);\nfor (uint8_t i = 0; i < FILTER_WINDOW_SIZE; i++) {\n  readings[i] = latestRawValue;\n  ringTotal += readings[i];\n}\nfilteredAverage = ringTotal / FILTER_WINDOW_SIZE;"
+      },
+      loop: {
+        title: "loop() Eintritt: Zeit erfassen",
+        desc: "Erfasst den aktuellen Systemtimer über millis(). Ermöglicht die nicht-blockierende Ausführung beider Aufgaben ohne delay().",
+        code: "void loop() {\n  unsigned long currentMillis = millis();\n  // Tasks prüfen..."
+      },
+      check_t1: {
+        title: "Task 1 Bedingung: 50 ms Intervall (20 Hz)",
+        desc: "Prüft, ob seit der letzten Abtastung mindestens 50 ms vergangen sind (Anforderung A-02: 20 Hz Abtastrate).",
+        code: "if (currentMillis - lastSampleTime >= SAMPLE_INTERVAL_MS) {\n  lastSampleTime = currentMillis;\n  // Abtastung durchführen...\n}"
+      },
+      task1: {
+        title: "Task 1 Ausführung: ADC & Moving Average",
+        desc: "Liest Pin A0 ein (10-Bit ADC: 0..1023 Digits). Der älteste Wert wird subtrahiert, der Neuwert eingefügt und der Mittelwert über N=10 Samples berechnet.",
+        code: "latestRawValue = analogRead(PIN_ANALOG_IN);\nringTotal -= readings[readIndex];\nreadings[readIndex] = latestRawValue;\nringTotal += readings[readIndex];\nreadIndex = (readIndex + 1) % FILTER_WINDOW_SIZE;\nfilteredAverage = (uint16_t)(ringTotal / FILTER_WINDOW_SIZE);"
+      },
+      check_t2: {
+        title: "Task 2 Bedingung: 100 ms Intervall (10 Hz)",
+        desc: "Prüft, ob seit der letzten Bus-Übertragung mindestens 100 ms vergangen sind (Anforderung A-04: >= 10 Hz Übertragungsrate).",
+        code: "if (currentMillis - lastTxTime >= BUS_TX_INTERVAL_MS) {\n  lastTxTime = currentMillis;\n  // Telegramm senden...\n}"
+      },
+      task2: {
+        title: "Task 2 Ausführung: UART-Framing & Senden",
+        desc: "Formatiert das ASCII-Telegramm <VAL:xxxx;RAW:xxxx> mit 4-stelligen Null-gefüllten Ganzzahlen und überträgt es über Serial1 an den Empfänger.",
+        code: "char txBuffer[32];\nsnprintf(txBuffer, sizeof(txBuffer), \"<VAL:%04u;RAW:%04u>\",\n         filteredAverage, latestRawValue);\nBUS_SERIAL.println(txBuffer);"
+      },
+      loop_end: {
+        title: "Ende des loop()-Durchlaufs",
+        desc: "Der Schleifendurchlauf ist abgeschlossen. Der Controller springt sofort wieder an den Anfang von loop(), um die Zeitbedingungen erneut zu prüfen.",
+        code: "  // Ende von loop()\n}\n// Nächster Aufruf erfolgt unmittelbar"
+      }
+    };
+
+    function updatePot(val) {
+      potVal = parseInt(val);
+      const volt = (potVal * 5.0 / 1023.0).toFixed(2);
+      document.getElementById('sliderValDisplay').innerText = `${potVal} Digits (${volt} V)`;
+    }
+
+    function renderBuffer() {
+      const grid = document.getElementById('bufferGrid');
+      grid.innerHTML = '';
+      readings.forEach((v, idx) => {
+        const isCurrent = idx === readIndex;
+        const cell = document.createElement('div');
+        cell.className = `p-2 rounded-lg border ${isCurrent ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 font-bold' : 'bg-slate-950 border-slate-800 text-slate-300'}`;
+        cell.innerHTML = `
+          <div class="text-[9px] text-slate-500">[${idx}]</div>
+          <div>${v}</div>
+        `;
+        grid.appendChild(cell);
+      });
+
+      document.getElementById('bufIdx').innerText = readIndex;
+      document.getElementById('valTotal').innerText = ringTotal;
+      document.getElementById('valAvg').innerText = filteredAverage;
+    }
+
+    function selectNode(key) {
+      document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-node'));
+      const activeEl = document.getElementById(`node_${key}`);
+      if (activeEl) activeEl.classList.add('active-node');
+
+      const data = nodeDetails[key];
+      if (data) {
+        document.getElementById('detailTitle').innerText = data.title;
+        document.getElementById('detailDesc').innerText = data.desc;
+        document.getElementById('detailCode').innerText = data.code;
+      }
+    }
+
+    function stepSim() {
+      currentNodeIndex = (currentNodeIndex + 1) % nodeOrder.length;
+      if (currentNodeIndex === 0) currentNodeIndex = 3; // Skip setup in normal loop
+
+      const key = nodeOrder[currentNodeIndex];
+      selectNode(key);
+
+      simMillis += 25; // 25ms Fortschritt
+
+      // Wenn Task 1 ausgeführt wird: Puffer updaten
+      if (key === 'task1') {
+        ringTotal -= readings[readIndex];
+        readings[readIndex] = potVal;
+        ringTotal += readings[readIndex];
+        readIndex = (readIndex + 1) % 10;
+        filteredAverage = Math.floor(ringTotal / 10);
+        renderBuffer();
+      }
+
+      // Wenn Task 2 ausgeführt wird: Telegramm erneuern
+      if (key === 'task2') {
+        const valStr = String(filteredAverage).padStart(4, '0');
+        const rawStr = String(potVal).padStart(4, '0');
+        const telegram = `<VAL:${valStr};RAW:${rawStr}>`;
+        document.getElementById('txTelegramDisplay').innerText = telegram;
+      }
+    }
+
+    function toggleAuto() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+        document.getElementById('btnAuto').innerText = "Auto-Play ▶";
+        document.getElementById('btnAuto').className = "px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-lg transition-colors";
+      } else {
+        autoInterval = setInterval(stepSim, 600);
+        document.getElementById('btnAuto').innerText = "Pause ⏸";
+        document.getElementById('btnAuto').className = "px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg transition-colors";
+      }
+    }
+
+    function downloadSvg() {
+      const svg = document.getElementById('papSvg').outerHTML;
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Sender_Fliessdiagramm_DIN66001.svg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    window.onload = () => {
+      renderBuffer();
+      selectNode('loop');
+    };
+  </script>
+</body>
+</html>

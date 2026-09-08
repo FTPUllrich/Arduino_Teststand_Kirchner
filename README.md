@@ -16,7 +16,8 @@
 | **🛑 Hold-Bedienlogik** | Taster an Pin `D4` (`INPUT_PULLUP`, Active LOW, Entprellung $\ge 50\,\text{ms}$) | Messwert wird nur bei Tastendruck aktualisiert und bis zum nächsten Druck eingefroren |
 | **⚡ 70%-Sprung- & Plausibilitätsalarm** | Optischer LCD-Alarm bei relativem Sprung $\|\Delta\| \ge 70\,\%$ zum Vorgängerwert | Erkennt Sensorabrisse & Prozessanomalien; Nullpunktsschutz bei Werten nahe $0\,\text{V}$ |
 | **🛡️ Watchdog & Auto-Recovery** | Software-Timeout bei Telegrammausfall $> 2{,}0\,\text{s}$ $\rightarrow$ LCD blinkt `ERR! TIMEOUT` | Fail-Safe-Verhalten; automatischer Wiederanlauf bei Signalrückkehr |
-| **🌐 2× Interaktive Web-Sandboxen** | 1. Prozess-Simulation mit Live-Scope & Puffer<br>2. Physical Architecture Board | Vollständige Simulation im Browser & ideale Gesprächsgrundlage für Meetings |
+| **🔄 DIN 66001 Fließdiagramm** | Normgerechter PAP & interaktiver Step-Debugger mit SVG-Export | Vollständige Modellierung von Abtast- (20 Hz) & Sende-Zyklus (10 Hz) |
+| **🌐 3× Interaktive Web-Sandboxen** | 1. Prozess-Simulation mit Live-Scope<br>2. Physical Architecture Board<br>3. Sender PAP-Simulator | Vollständige Simulation im Browser & ideale Gesprächsgrundlage für Meetings |
 | **🏛️ MBSE & Capella-Schnittstelle** | Standardisierter **OMG ReqIF 1.0** Export (`.reqif`) | Direkter Import in Eclipse Capella, IBM DOORS & Siemens Polarion |
 
 ---
@@ -29,6 +30,7 @@
 | **1. Anforderungsanalyse (VDI 2206)** | 🟢 **Abgeschlossen** | [`Anforderungsspezifikation_Arduino_Teststand.md`](Anforderungsspezifikation_Arduino_Teststand.md) |
 | **2. Hardware-Schaltplan & Pinbelegung** | 🟢 **Abgeschlossen** | [`Aufbauanleitung_und_Schaltplan.md`](Aufbauanleitung_und_Schaltplan.md) |
 | **3. Firmware-Implementierung (UNO R4)** | 🟢 **Abgeschlossen** | Firmware-Dateien [`Sender.ino`](Sender.ino) & [`Empfaenger.ino`](Empfaenger.ino) |
+| **3b. Software-Architektur & PAP** | 🟢 **Modelliert** | Fließdiagramm nach DIN 66001 [`Sender_Programmablaufplan_Fliessdiagramm.md`](Sender_Programmablaufplan_Fliessdiagramm.md) & [`Sender_Fliessdiagramm_Interaktiv.html`](Sender_Fliessdiagramm_Interaktiv.html) |
 | **4. Modulare Parameter-Konfiguration** | 🟢 **Abgeschlossen** | Zentrale Header-Datei [`TeststandConfig.h`](TeststandConfig.h) |
 | **5. V-Modell Methodik (VDI 2206)** | 🟢 **Ausgearbeitet** | [`V-MODELL_ARDUINO_TESTSTAND.md`](V-MODELL_ARDUINO_TESTSTAND.md) & Vektorgrafik |
 | **6. Gesprächsleitfaden (Lehrertermin)**| 🟢 **Einsatzbereit** | [`GESPRAECHSGRUNDLAGE_LEHRERTERMIN.md`](GESPRAECHSGRUNDLAGE_LEHRERTERMIN.md) |
@@ -83,6 +85,8 @@ Projekt_Kirchner_Unterricht/
 ├── Anforderungs_Audit_und_Konsequenzen.md          # Detaillierte Prüfung & Konsequenzen aus der Schulcheckliste (11 Kriterien)
 ├── Anforderungsspezifikation_Arduino_Teststand.md  # Normgerechtes Lastenheft (VDI 2206 / VDI 2221) mit Glossar
 ├── Deterministischer_Automat_Dokumentation.md      # Formale DFA/FSM-Spezifikation (Zustandsautomat, 6-Tupel & Tabellen)
+├── Sender_Programmablaufplan_Fliessdiagramm.md     # Normgerechter DIN 66001 PAP, Code-Mapping & Timing-Analyse
+├── Sender_Fliessdiagramm_Interaktiv.html           # Interaktiver visueller PAP-Simulator mit Step-Debugger & SVG-Export
 ├── Requirements_Management_Portal.html             # Interaktives Web-Portal zur Verwaltung & Live-Export der Anforderungen
 ├── ReqIF_Grafischer_Viewer.html                    # Grafischer OMG ReqIF 1.0 Web-Viewer & Strukturbaum für den Browser
 ├── Teststand_Sandbox_Simulation.html               # Interaktive Prozess- & Plausibilitäts-Sandbox mit Oszilloskop
@@ -107,9 +111,11 @@ Projekt_Kirchner_Unterricht/
 
 ## ⚡ Schnellstart (Quickstart)
 
-### 1. Interaktive Sandboxen starten (Keine Installation nötig)
+### 1. Interaktive Sandboxen & Visualisierer starten (Keine Installation nötig)
 * Öffnen Sie [`Teststand_Sandbox_Simulation.html`](Teststand_Sandbox_Simulation.html) im Browser zur Prozess- und Plausibilitätssimulation.
+* Öffnen Sie [`Sender_Fliessdiagramm_Interaktiv.html`](Sender_Fliessdiagramm_Interaktiv.html) zum interaktiven Nachvollziehen des Sender-Programmablaufs (DIN 66001).
 * Öffnen Sie [`Physische_Komponenten_Sandbox.html`](Physische_Komponenten_Sandbox.html) für das Hardware-Architektur-Board und die Besprechungsgrundlage.
+* Öffnen Sie [`Projekt_Start_Hub.html`](Projekt_Start_Hub.html) als zentrale Steuerungs- und Übersichtsseite.
 
 ### 2. Sketche auf Arduino UNO R4 flashen
 1. In der Arduino IDE die Bibliothek **`LiquidCrystal I2C`** installieren.

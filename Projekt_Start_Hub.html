@@ -58,13 +58,13 @@
       </div>
     </div>
 
-    <!-- SCHNELLSTART-RASTER: DIE 4 INTERAKTIVEN TOOLS -->
+    <!-- SCHNELLSTART-RASTER: DIE 5 INTERAKTIVEN TOOLS -->
     <div>
       <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
         Interaktive Web-Tools & Simulatoren (Im Browser öffnen)
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         
         <!-- Tool 1: Simulator -->
         <a href="Teststand_Sandbox_Simulation.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-5 transition-all group shadow-xl">
@@ -90,7 +90,19 @@
           </p>
         </a>
 
-        <!-- Tool 3: ReqIF Viewer -->
+        <!-- Tool 3: Fließdiagramm & PAP Simulator -->
+        <a href="Sender_Fliessdiagramm_Interaktiv.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 transition-all group shadow-xl">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-sky-400 font-bold px-2.5 py-0.5 rounded bg-sky-500/10 border border-sky-500/20">DIN 66001 PAP</span>
+            <span class="text-xs text-slate-500 group-hover:text-sky-400 transition-colors font-mono">Öffnen ↗</span>
+          </div>
+          <h3 class="font-bold text-white text-base group-hover:text-sky-300 transition-colors">Sender Fließdiagramm (PAP)</h3>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+            Interaktiver Ablaufplan von Sender.ino (20 Hz Glättung, 10 Hz Busübertragung) mit Step-Debugger, FIFO-Puffer & SVG-Export.
+          </p>
+        </a>
+
+        <!-- Tool 4: ReqIF Viewer -->
         <a href="ReqIF_Grafischer_Viewer.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-5 transition-all group shadow-xl">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-mono text-indigo-400 font-bold px-2.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">OMG REQIF 1.0</span>
@@ -102,7 +114,7 @@
           </p>
         </a>
 
-        <!-- Tool 4: Management Portal -->
+        <!-- Tool 5: Management Portal -->
         <a href="Requirements_Management_Portal.html" target="_blank" class="block bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 transition-all group shadow-xl">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-mono text-amber-400 font-bold px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">MANAGEMENT-PORTAL</span>
@@ -168,6 +180,14 @@
           <li>
             <a href="Sender.ino" class="text-blue-400 hover:underline font-semibold block font-mono">⚡ Sender.ino</a>
             <span class="text-slate-400 text-[11px]">Datenerfassung an Pin A0, Ringpuffer (N=10), Hardware-UART Serial1.</span>
+          </li>
+          <li>
+            <a href="Sender_Programmablaufplan_Fliessdiagramm.md" class="text-sky-400 hover:underline font-semibold block">🔄 Sender_Programmablaufplan_Fliessdiagramm.md</a>
+            <span class="text-slate-400 text-[11px]">Normgerechter DIN 66001 Programmablaufplan mit Code-Mapping & Timing-Analyse.</span>
+          </li>
+          <li>
+            <a href="Sender_Fliessdiagramm_Interaktiv.html" class="text-sky-400 hover:underline font-semibold block">📊 Sender_Fliessdiagramm_Interaktiv.html</a>
+            <span class="text-slate-400 text-[11px]">Interaktiver visueller PAP-Simulator mit Step-by-Step Debugger & SVG-Export.</span>
           </li>
           <li>
             <a href="Empfaenger.ino" class="text-purple-400 hover:underline font-semibold block font-mono">📟 Empfaenger.ino</a>
